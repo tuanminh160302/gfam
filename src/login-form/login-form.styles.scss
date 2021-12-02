@@ -1,0 +1,51 @@
+@mixin shrink {
+    bottom: 40px;
+    font-size: .8rem;
+    color: black;
+}
+
+.group {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+
+    .input-field {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 10px;
+        font-size: 1rem;
+        text-align: left;
+    
+        border: none;
+        border-bottom: 1px solid black;
+        background: white;
+
+        display: block;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus ~ .input-label {
+            @include shrink();
+        }
+
+        &.login-form-input {
+            margin-bottom: calc(4vh + 30px);
+        }
+    }
+    
+    .input-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        pointer-events: none;
+        transition: .3s;
+        color: gray;
+
+        &.shrink {
+            @include shrink();
+            transition: .3s;
+        }
+    }
+}

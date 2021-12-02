@@ -1,23 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 
-function App() {
+import { connect } from 'react-redux';
+import { Routes, Route, withRouter } from 'react-router-dom';
+
+import Header from './components/header/header.component';
+import LoginPage from './pages/login-page/login-page.component';
+
+const App = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header isLoggedIn={false}/>
+      <Routes>
+        <Route path='/login' element={<LoginPage />}></Route>
+      </Routes>
     </div>
   );
 }
