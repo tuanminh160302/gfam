@@ -1,9 +1,10 @@
 import './button.styles.scss';
 
-const Button = ({text, background, onClick, color, textSize, padding}) => {
+const Button = ({type, text, background, onClick, color, textSize, padding}) => {
     return (
         <span   
             className="button" 
+            type={type}
             style={{
                     background: `${background}`, 
                     color: `${color}`, 

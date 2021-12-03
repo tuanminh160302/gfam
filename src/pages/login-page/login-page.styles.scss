@@ -5,9 +5,21 @@
     grid-template-rows: 15vh 70vh 15vh;
     grid-template-columns: 20vw 40vw 20vw 20vw;
 
-    .login-form {
+    .form {
         grid-area: 2/3/3/4;
         height: 100%;
         width: 100%;
+
+        &.sign-up {
+            display: none;
+            opacity: 0;
+        }
+    }
+
+    .instead {
+        width: fit-content;
+        display: block;
+        cursor: pointer;
+        margin-top: 3vh;
     }
 }

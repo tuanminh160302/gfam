@@ -30,8 +30,8 @@
             @include shrink();
         }
 
-        &.login-form-input {
-            margin-bottom: calc(4vh + 30px);
+        &.margin-bottom {
+            margin-bottom: calc(2vh + 30px);
         }
     }
     
