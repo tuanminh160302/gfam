@@ -1,19 +1,21 @@
 import './button.styles.scss';
 
-const Button = ({type, text, background, onClick, color, textSize, padding}) => {
+const Button = ({type, text, background, color, textSize, margin, padding, ...otherProps}) => {
     return (
-        <span   
+        <button   
             className="button" 
             type={type}
             style={{
                     background: `${background}`, 
                     color: `${color}`, 
                     fontSize: `${textSize}`, 
-                    padding: `${padding}`}} 
-            onClick={onClick}>
+                    padding: `${padding}`,
+                    margin: `${margin}`
+                }} 
+            {...otherProps}>
             {text}
-        </span>
+        </button>
     )
 }
 
-export default Button
+export default Button;
