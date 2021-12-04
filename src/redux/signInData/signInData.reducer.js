@@ -2,8 +2,10 @@ import inputValueTypes from "./signInData.types";
 
 const INITIAL_STATE = {
     email: '',
+    userName: '',
+    displayName: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
 }
 
 const signInReducer = (state=INITIAL_STATE, action) => {

@@ -10,8 +10,9 @@ import gsap from 'gsap';
 
 import firebaseApp from '../../firebase/firebase.init';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserCredentials } from '../../firebase/firebase.init';
 
-const LoginPage = ({ email, password, confirmPassword, setData }) => {
+const LoginPage = ({ email, userName, displayName, password, confirmPassword, setData }) => {
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()
@@ -47,7 +48,8 @@ const LoginPage = ({ email, password, confirmPassword, setData }) => {
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                console.log(userCredential)
+                await createUserCredentials(user, {email, userName, displayName})
+                // console.log(user)
                 // ...
             })
             .catch((error) => {
@@ -88,10 +90,30 @@ const LoginPage = ({ email, password, confirmPassword, setData }) => {
                     inputStyle='margin-bottom'
                     name='email'
                     type='email'
-                    labelText='Username'
+                    labelText='Email'
                     onChange={(e) => { handleInputChange(e) }}
                     value={email}
                     required
+                />
+
+                <FormInput
+                    inputStyle='margin-bottom'
+                    name='userName'
+                    type='text'
+                    labelText='Username'
+                    onChange={(e) => { handleInputChange(e) }}
+                    value={userName}
+                    // required
+                />
+
+                <FormInput
+                    inputStyle='margin-bottom'
+                    name='displayName'
+                    type='text'
+                    labelText='Display name'
+                    onChange={(e) => { handleInputChange(e) }}
+                    value={displayName}
+                    // required
                 />
 
                 <FormInput
@@ -129,8 +151,10 @@ const LoginPage = ({ email, password, confirmPassword, setData }) => {
 
 const mapStateToProps = ({ signInData }) => ({
     email: signInData.email,
+    userName: signInData.userName,
+    displayName: signInData.displayName,
     password: signInData.password,
-    confirmPassword: signInData.confirmPassword
+    confirmPassword: signInData.confirmPassword,
 })
 
 const mapDispatchToProps = (dispatch) => ({
