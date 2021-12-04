@@ -7,10 +7,12 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
+import { setSignInState } from './redux/signInState/signInState.actions'
+
 import Header from './components/header/header.component';
 import LoginPage from './pages/login-page/login-page.component';
 
-const App = () => {
+const App = ({isSignedIn, setSignInState}) => {
 
   let navigate = useNavigate()
 
@@ -23,11 +25,13 @@ const App = () => {
               // https://firebase.google.com/docs/reference/js/firebase.User
               const uid = user.uid;
               navigate("/")
+              setSignInState(true)
               console.log('signed in')
               // ...
           } else {
               // User is signed out
               navigate("/login")
+              setSignInState(false)
               console.log('signed out')
               // ...
           }
@@ -44,4 +48,12 @@ const App = () => {
   );
 }
 
-export default App;
+const mapStateToProps = ({isSignedIn}) => ({
+  isSignedIn: isSignedIn.isSignedIn
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  setSignInState: (isSignedIn) => {dispatch(setSignInState(isSignedIn))}
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

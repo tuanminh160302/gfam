@@ -1,9 +1,12 @@
 import './form-input.styles.scss';
 
-const FormInput = ({ type, labelText, onChange, value, inputStyle, name, ...otherProps}) => {
+import { connect } from 'react-redux';
+
+const FormInput = ({ isSignedIn, type, labelText, onChange, value, inputStyle, name}) => {
+
     return (
         <div className='group'>
-            <input className={`input-field ${inputStyle}`} type={type} onChange={onChange} name={name} {...otherProps}/>
+            <input className={`input-field ${inputStyle}`} type={type} onChange={onChange} name={name} required/>
             {
                 labelText ?
                 (<label className={`${value.length ? 'shrink' : ''} input-label`}>{labelText}</label>)
@@ -14,5 +17,9 @@ const FormInput = ({ type, labelText, onChange, value, inputStyle, name, ...othe
     )
 }
 
+const mapStateToProps = ({isSignedIn}) => ({
+    isSignedIn: isSignedIn.isSignedIn
+})
 
-export default FormInput
+
+export default connect(mapStateToProps)(FormInput)

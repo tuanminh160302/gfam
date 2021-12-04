@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
@@ -23,8 +23,16 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
             [name]: value
         }
         setData(dataObject)
-        // console.log(email, password)
-        console.log(name, value)
+    }
+
+    const resetInputData = () => {
+        const dataKeys = ['email', 'userName', 'displayName', 'password', 'confirmPassword'];
+        for (const key of dataKeys) {
+            const dataObject = {
+                [key]: ''
+            }
+            setData(dataObject)
+        }
     }
 
     const takeToSignUp = () => {
@@ -32,6 +40,8 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
         gsap.to(loginFormRef.current, { delay: .3, duration: 0, display: 'none' });
         gsap.to(signUpFormRef.current, { delay: .3, duration: 0, display: 'block' });
         gsap.to(signUpFormRef.current, { delay: .3, duration: .3, opacity: 1 });
+
+        resetInputData()
     }
 
     const takeToLogIn = () => {
@@ -39,6 +49,8 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
         gsap.to(signUpFormRef.current, { delay: .3, duration: 0, display: 'none' });
         gsap.to(loginFormRef.current, { delay: .3, duration: 0, display: 'block' });
         gsap.to(loginFormRef.current, { delay: .3, duration: .3, opacity: 1 });
+
+        resetInputData()
     }
 
     const handleFormSubmit = async (e) => {
@@ -51,6 +63,7 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
                 const user = userCredential.user;
                 createUserCredentials(user, { email, userName, displayName })
                 // console.log(user)
+                email = userName = displayName = password = confirmPassword = ''
                 // ...
             })
             .catch((error) => {
