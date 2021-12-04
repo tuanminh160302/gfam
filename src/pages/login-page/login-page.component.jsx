@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
@@ -43,13 +43,13 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        
+
         const auth = getAuth();
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                createUserCredentials(user, {email, userName, displayName})
+                createUserCredentials(user, { email, userName, displayName })
                 // console.log(user)
                 // ...
             })
@@ -86,7 +86,7 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
                 <span className='instead' onClick={() => { takeToSignUp() }}>Create an account instead</span>
             </form>
 
-            <form className='form sign-up' ref={signUpFormRef} onSubmit={(e) => { handleFormSubmit(e)}}>
+            <form className='form sign-up' ref={signUpFormRef} onSubmit={(e) => { handleFormSubmit(e) }}>
                 <FormInput
                     inputStyle='margin-bottom'
                     name='email'
@@ -104,7 +104,7 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
                     labelText='Username'
                     onChange={(e) => { handleInputChange(e) }}
                     value={userName}
-                    // required
+                // required
                 />
 
                 <FormInput
@@ -114,7 +114,7 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
                     labelText='Display name'
                     onChange={(e) => { handleInputChange(e) }}
                     value={displayName}
-                    // required
+                // required
                 />
 
                 <FormInput

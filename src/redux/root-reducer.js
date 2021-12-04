@@ -1,6 +1,8 @@
 import { combineReducers } from "redux";
-import signInData from "./signInData/signInData.reducer";
+import signInReducer from "./signInData/signInData.reducer";
+import signInStateReducer from "./signInState/signInState.reducer";
 
 export default combineReducers({
-    signInData: signInData
+    signInData: signInReducer,
+    isSignedIn: signInStateReducer
 })
