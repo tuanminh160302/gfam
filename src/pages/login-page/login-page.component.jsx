@@ -42,13 +42,14 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
     }
 
     const handleFormSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+        
         const auth = getAuth();
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                await createUserCredentials(user, {email, userName, displayName})
+                createUserCredentials(user, {email, userName, displayName})
                 // console.log(user)
                 // ...
             })
