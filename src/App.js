@@ -11,6 +11,7 @@ import { setSignInState } from './redux/signInState/signInState.actions'
 
 import Header from './components/header/header.component';
 import LoginPage from './pages/login-page/login-page.component';
+import NewsFeed from './pages/newsfeed/newsfeed.component';
 
 const App = ({isSignedIn, setSignInState}) => {
 
@@ -24,25 +25,26 @@ const App = ({isSignedIn, setSignInState}) => {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
               const uid = user.uid;
-              navigate("/")
+              navigate("/", {replace: true})
               setSignInState(true)
               console.log('signed in')
               // ...
           } else {
               // User is signed out
-              navigate("/login")
+              navigate("/login", {replace: true})
               setSignInState(false)
               console.log('signed out')
               // ...
           }
       });
-  }, [auth])
+  }, [auth, navigate, setSignInState])
 
   return (
     <div className="App">
       <Header isLoggedIn={false}/>
       <Routes>
         <Route path='/login' element={<LoginPage />}></Route>
+        <Route path='/' element={<NewsFeed />}></Route>
       </Routes>
     </div>
   );

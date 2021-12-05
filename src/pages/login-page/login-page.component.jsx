@@ -3,17 +3,44 @@ import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
 import { connect } from 'react-redux'
+import { useNavigate } from 'react-router-dom';
+
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 import { setInputField } from '../../redux/signInState/signInState.actions';
+import { setSignInState } from '../../redux/signInState/signInState.actions';
+
 import Button from '../../components/button/button.component';
 
 import gsap from 'gsap';
 
 import firebaseApp from '../../firebase/firebase.init';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { createUserCredentials } from '../../firebase/firebase.init';
 
-const LoginPage = ({ inputFieldType, setInputField, email, userName, displayName, password, confirmPassword, setData }) => {
+const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userName, displayName, password, confirmPassword, setData }) => {
+
+    let navigate = useNavigate()
+    const auth = getAuth();
+ 
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                const uid = user.uid;
+                navigate("/", {replace: true})
+                setSignInState(true)
+                console.log('signed in')
+                // ...
+            } else {
+                // User is signed out
+                navigate("/login", {replace: true})
+                setSignInState(false)
+                console.log('signed out')
+                // ...
+            }
+        });
+    }, [auth, navigate, setSignInState])
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()
@@ -210,6 +237,7 @@ const mapStateToProps = ({ signInData, isSignedIn }) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
+    setSignInState: (isSignedIn) => {dispatch(setSignInState(isSignedIn))},
     setData: (data) => { dispatch(getInputValue(data)) },
     setInputField: (type) => { dispatch(setInputField(type)) }
 })

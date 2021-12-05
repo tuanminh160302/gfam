@@ -1,4 +1,9 @@
+import { useState } from 'react';
+
 import './header.styles.scss'
+
+import UserAvt from '../../assets/media/user-avt.jpg';
+import {ReactComponent as LogOutBtn} from '../../assets/media/power.svg';
 
 import Button from '../button/button.component';
 import { getAuth, signOut } from "firebase/auth";
@@ -6,7 +11,13 @@ import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 
-const Header = ({isLoggedIn, setData}) => {
+const Header = ({isSignedIn, setData}) => {
+
+    const [toggleUserNav, setToggleUserNav] = useState(false);
+
+    const handleToggleUserNav = () => {
+        setToggleUserNav(!toggleUserNav)
+    }
 
     const handleSignOut = () => {
         const auth = getAuth();
@@ -18,6 +29,7 @@ const Header = ({isLoggedIn, setData}) => {
                   [key]: ''
               }
               setData(dataObject)
+              setToggleUserNav(false)
           }
         }).catch((error) => {
           // An error happened.
@@ -26,30 +38,34 @@ const Header = ({isLoggedIn, setData}) => {
 
     return (
         <div className='header'>
-            {isLoggedIn 
+            {isSignedIn 
             ? <div className='header-nav'>
-                
+                {/* <Button 
+                    className='sign-out-btn'
+                    text='Sign Out'
+                    onClick={() => {handleSignOut()}}
+                /> */}
+                <img src={UserAvt} alt="" className="user-avt" onClick={() => {handleToggleUserNav()}}/>
             </div>
             : <div className='header-nav'>
-                {/* <Button text="Log In" background='black' color='white' textSize='1.25rem'/>
-                <Button text="Sign Up" background='black' color='white' textSize='1.25rem'/> */}
+
             </div>
             }
 
-            <Button 
-                background='black'
-                text='Sign Out'
-                color='white'
-                onClick={() => {handleSignOut()}}
-            />
+            {isSignedIn &&             
+            <div className={`${toggleUserNav && 'appear'} user-nav`}>
+                <LogOutBtn className='nav log-out' onClick={() => {handleSignOut()}}/>
+            </div>}
         </div>
     )
 }
 
-
+const mapStateToProps = ({isSignedIn}) => ({
+    isSignedIn: isSignedIn.isSignedIn
+})
 
 const mapDispatchToProps = (dispatch) => ({
     setData: (data) => { dispatch(getInputValue(data)) }
 })
 
-export default connect(null, mapDispatchToProps)(Header);
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

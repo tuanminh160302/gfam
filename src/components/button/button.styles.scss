@@ -1,14 +1,12 @@
 .button {
     height: fit-content;
     width: fit-content;
-    padding: 20px 50px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 500;
     cursor: pointer;
     transition: .2s;
-    font-size: 1.25rem;
+    border: none;
 
     &:hover {
         -webkit-box-shadow: 2px 2px 15px 0px rgba(0,0,0,0.35); 

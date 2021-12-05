@@ -1,15 +1,70 @@
+@import '../../assets/uik.styles.scss';
+
 .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
-    height: 15vh;
+    height: 10vh;
     width: 100vw;
-    background-color: transparent;
+    background-color: $main;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
 
     .header-nav {
-        float: right;
         display: flex;
         flex-direction: row;
-        transform: translateY(50%);
+        position: absolute;
+        right: 3vw;
+
+        .sign-out-btn {
+            color: $main;
+            background: white;
+            font-weight: 700;
+            padding: 16px 24px;
+        }
+
+        .user-avt {
+            height: 5vh;
+            width: 5vh;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: .5vh;
+            border: 2px solid white;
+        }
+    }
+
+    .user-nav {
+        background: $second-gray;
+        height: 76vh;
+        width: 6vh;
+        position: absolute;
+        top: 12vh;
+        right: 3vw;
+        border-radius: 50px;
+        transform: translateX(10vw);
+        transition: .4s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &.appear {
+            transform: translateX(0);
+            transition: .4s ease-in-out;
+        }
+
+        .nav {
+            fill: $main;
+            height: 4vh;
+            width: 4vh;
+            position: absolute;
+            cursor: pointer;
+
+            &.log-out {
+                bottom: 3vh;
+            }
+        }
     }
 }
