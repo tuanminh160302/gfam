@@ -22,4 +22,11 @@
         cursor: pointer;
         margin-top: 3vh;
     }
+
+    .error-msg {
+        width: fit-content;
+        display: block;
+        margin-top: 2vh;
+        color: red;
+    }
 }

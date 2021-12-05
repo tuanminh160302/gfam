@@ -1,7 +1,8 @@
 import signInState from "./signInState.types";
 
 const INITIAL_STATE = {
-    isSignedIn: null
+    isSignedIn: null,
+    inputFieldType: '',
 }
 
 const signInStateReducer = (state=INITIAL_STATE, action) => {
@@ -10,6 +11,12 @@ const signInStateReducer = (state=INITIAL_STATE, action) => {
             return {
                 ...state,
                 isSignedIn: action.payload
+            }
+
+        case signInState.SET_INPUT_FIELD_TYPE:
+            return {
+                ...state,
+                inputFieldType: action.payload
             }
 
         default:

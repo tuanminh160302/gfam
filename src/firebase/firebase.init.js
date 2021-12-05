@@ -23,7 +23,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(firebaseApp);
 // ...
 
-const db = getFirestore();
+export const db = getFirestore();
 
 export const createUserCredentials = async (userCredentials, additionalData) => {
   const {uid} = userCredentials

@@ -1,21 +1,27 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
 import { connect } from 'react-redux'
 import { getInputValue } from '../../redux/signInData/signInData.actions';
+import { setInputField } from '../../redux/signInState/signInState.actions';
 import Button from '../../components/button/button.component';
 
 import gsap from 'gsap';
 
 import firebaseApp from '../../firebase/firebase.init';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { createUserCredentials } from '../../firebase/firebase.init';
 
-const LoginPage = ({ email, userName, displayName, password, confirmPassword, setData }) => {
+const LoginPage = ({ inputFieldType, setInputField, email, userName, displayName, password, confirmPassword, setData }) => {
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()
+    const errorMessageRef = useRef()
+
+    useEffect(() => {
+        errorMessageRef.current.innerText = ""
+    }, [inputFieldType])
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -42,6 +48,7 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
         gsap.to(signUpFormRef.current, { delay: .3, duration: .3, opacity: 1 });
 
         resetInputData()
+        setInputField('sign-up')
     }
 
     const takeToLogIn = () => {
@@ -51,9 +58,10 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
         gsap.to(loginFormRef.current, { delay: .3, duration: .3, opacity: 1 });
 
         resetInputData()
+        setInputField('log-in')
     }
 
-    const handleFormSubmit = async (e) => {
+    const handleSignUp = (e) => {
         e.preventDefault();
 
         const auth = getAuth();
@@ -74,14 +82,32 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
             });
     }
 
+    const handleLogIn = (e) => {
+        e.preventDefault()
+
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage)
+                errorMessageRef.current.innerText = "Wrong Email or Password. Please recheck"
+            });
+    }
+
     return (
         <div className='login-page'>
-            <form className='form log-in' ref={loginFormRef}>
+            <form className='form log-in' ref={loginFormRef} onSubmit={(e) => { handleLogIn(e) }}>
                 <FormInput
                     inputStyle='margin-bottom'
                     name='email'
                     type='email'
-                    labelText='Username'
+                    labelText='Email'
                     onChange={(e) => { handleInputChange(e) }}
                     value={email}
                     required
@@ -96,10 +122,20 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
                     required
                 />
 
-                <span className='instead' onClick={() => { takeToSignUp() }}>Create an account instead</span>
+                <span className='instead' onClick={() => { takeToSignUp() }}>Create an account</span>
+
+                <Button
+                    type='submit'
+                    text='Log In'
+                    background='black'
+                    color='white'
+                    margin='2vh 0 0 0'
+                />
+
+                <span className='error-msg' ref={errorMessageRef}></span>
             </form>
 
-            <form className='form sign-up' ref={signUpFormRef} onSubmit={(e) => { handleFormSubmit(e) }}>
+            <form className='form sign-up' ref={signUpFormRef} onSubmit={(e) => { handleSignUp(e) }}>
                 <FormInput
                     inputStyle='margin-bottom'
                     name='email'
@@ -163,16 +199,19 @@ const LoginPage = ({ email, userName, displayName, password, confirmPassword, se
     )
 }
 
-const mapStateToProps = ({ signInData }) => ({
+const mapStateToProps = ({ signInData, isSignedIn }) => ({
     email: signInData.email,
     userName: signInData.userName,
     displayName: signInData.displayName,
     password: signInData.password,
     confirmPassword: signInData.confirmPassword,
+
+    inputFieldType: isSignedIn.inputFieldType
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    setData: (data) => { dispatch(getInputValue(data)) }
+    setData: (data) => { dispatch(getInputValue(data)) },
+    setInputField: (type) => { dispatch(setInputField(type)) }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
