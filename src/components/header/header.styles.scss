@@ -10,7 +10,7 @@
     height: 10vh;
     width: 100vw;
     background-color: white;
-    border-bottom: 3px solid $main;
+    border-bottom: 2px solid $main;
 
     .header-nav {
         display: flex;
@@ -49,9 +49,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        border-top: 3px solid $main;
-        border-left: 3px solid $main;
-        border-bottom: 3px solid $main;
+        border-top: 2px solid $main;
+        border-left: 2px solid $main;
+        border-bottom: 2px solid $main;
 
         &.appear {
             transform: translateX(0);
