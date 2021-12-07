@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,6 +25,7 @@ const analytics = getAnalytics(firebaseApp);
 // ...
 
 export const db = getFirestore();
+export const storage = getStorage();
 
 export const createUserCredentials = async (userCredentials, additionalData) => {
   const {uid} = userCredentials
@@ -41,6 +43,40 @@ if(!userSnap.exists()) {
     } catch (err) {
       console.log('error creating user', err.message)
     }
+  }
+}
+
+export const uploadUserData = async (user, fileCollection, file, fileName, isUploadingAvatar) => {
+  // Get user data
+  const {uid} = user
+  const userRef = doc(db, "users", uid)
+  const userSnap = await getDoc(userRef)
+  
+  // Get user username
+  const userName = userSnap.data().userName
+
+  // Set up
+  const pathToFile = `users/${userName}/${fileCollection}/${fileName}`
+  const fileRef = ref(storage, pathToFile)
+
+  // Upload the file
+  await uploadBytes(fileRef, file).then((snapshot) => {
+    console.log("Uploaded a blob or file!");
+  })
+
+  if (isUploadingAvatar) {
+    // Update the avatar url in the database
+    getDownloadURL(ref(storage, pathToFile))
+      .then((url) => {
+        setDoc(userRef, { avatarURL: url }, { merge: true })
+        .then(() => {
+          console.log("Successfully uploaded")
+          window.location.reload()
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 }
 

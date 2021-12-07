@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import './header.styles.scss'
 
-import UserAvt from '../../assets/media/user-avt.jpg';
 import { ReactComponent as LogOutBtn } from '../../assets/media/power.svg';
 
 import Button from '../button/button.component';
@@ -10,6 +9,8 @@ import { getAuth, signOut } from "firebase/auth";
 import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
+
+import UserAvt from '../user-avt/user-avt.component';
 
 const Header = ({ isSignedIn, setData }) => {
 
@@ -46,7 +47,8 @@ const Header = ({ isSignedIn, setData }) => {
                     text='Sign Out'
                     onClick={() => {handleSignOut()}}
                 /> */}
-                        <img src={UserAvt} alt="" className="user-avt" onClick={() => { handleToggleUserNav() }} />
+                        {/* <img src={} alt="" className="user-avt" onClick={() => { handleToggleUserNav() }} /> */}
+                        <UserAvt className='user-avt' onClick={() => { handleToggleUserNav() }}/>
                     </div>
                     : <div className='header-nav'>
 

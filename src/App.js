@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import './App.scss';
 
 import { connect } from 'react-redux';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -12,10 +12,9 @@ import { setSignInState } from './redux/signInState/signInState.actions'
 import Header from './components/header/header.component';
 import LoginPage from './pages/login-page/login-page.component';
 import NewsFeed from './pages/newsfeed/newsfeed.component';
+import Profile from './pages/profile/profile.component';
 
 const App = ({isSignedIn, setSignInState}) => {
-
-  let navigate = useNavigate()
 
   const auth = getAuth();
  
@@ -24,20 +23,17 @@ const App = ({isSignedIn, setSignInState}) => {
           if (user) {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
-              const uid = user.uid;
-              navigate("/", {replace: true})
               setSignInState(true)
               console.log('signed in')
               // ...
           } else {
               // User is signed out
-              navigate("/login", {replace: true})
               setSignInState(false)
               console.log('signed out')
               // ...
           }
       });
-  }, [auth, navigate, setSignInState])
+  }, [auth, setSignInState])
 
   return (
     <div className="App">
@@ -45,6 +41,7 @@ const App = ({isSignedIn, setSignInState}) => {
       <Routes>
         <Route path='/login' element={<LoginPage />}></Route>
         <Route path='/' element={<NewsFeed />}></Route>
+        <Route path='/:username' element={<Profile />}></Route>
       </Routes>
     </div>
   );
