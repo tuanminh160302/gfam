@@ -3,7 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable  } from "firebase/storage";
+import { updateProfile } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -28,11 +29,11 @@ export const db = getFirestore();
 export const storage = getStorage();
 
 export const createUserCredentials = async (userCredentials, additionalData) => {
-  const {uid} = userCredentials
+  const { uid } = userCredentials
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
-  
-if(!userSnap.exists()) {
+
+  if (!userSnap.exists()) {
     const createdAt = new Date();
 
     try {
@@ -47,11 +48,14 @@ if(!userSnap.exists()) {
 }
 
 export const uploadUserData = async (user, fileCollection, file, fileName, isUploadingAvatar) => {
+  if(!user) {
+    return
+  }
   // Get user data
-  const {uid} = user
+  const { uid } = user
   const userRef = doc(db, "users", uid)
   const userSnap = await getDoc(userRef)
-  
+
   // Get user username
   const userName = userSnap.data().userName
 
@@ -68,10 +72,15 @@ export const uploadUserData = async (user, fileCollection, file, fileName, isUpl
     // Update the avatar url in the database
     getDownloadURL(ref(storage, pathToFile))
       .then((url) => {
-        setDoc(userRef, { avatarURL: url }, { merge: true })
-        .then(() => {
-          console.log("Successfully uploaded")
-          window.location.reload()
+        updateProfile(user, {
+          photoURL: url
+        }).then(() => {
+          console.log("Profile updated")
+          setDoc(userRef, { avatarURL: url }, { merge: true })
+            .then(() => {
+              console.log("Successfully uploaded")
+              window.location.reload()
+            })
         })
       })
       .catch((err) => {

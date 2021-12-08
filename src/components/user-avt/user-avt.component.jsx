@@ -13,6 +13,7 @@ const UserAvt = ({onClick, className}) => {
     const db = getFirestore()
 
     const {uid} = user
+    console.log(user)
 
     const userRef = doc(db, "users", uid)
      

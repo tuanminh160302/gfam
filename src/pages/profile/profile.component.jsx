@@ -5,16 +5,16 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 const Profile = () => {
 
-    const auth = getAuth();
-    const user = auth.currentUser
-    console.log(user)
-
     const handleSubmitFile = (e) => {
 
     }
 
     const handleFileChange = (e) => {
         e.preventDefault()
+
+        const auth = getAuth();
+        const user = auth.currentUser
+        console.log(user)
 
         const file = e.target.files[0]
         const fileName = file.name
