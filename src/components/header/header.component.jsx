@@ -3,18 +3,44 @@ import { useState } from 'react';
 import './header.styles.scss'
 
 import { ReactComponent as LogOutBtn } from '../../assets/media/power.svg';
+import { ReactComponent as ProfileBtn } from '../../assets/media/profile.svg';
+import { ReactComponent as SavedBtn } from '../../assets/media/saved.svg';
+import { ReactComponent as SettingsBtn } from '../../assets/media/settings.svg';
+import { ReactComponent as SwitchBtn } from '../../assets/media/switch.svg';
 
 import Button from '../button/button.component';
 import { getAuth, signOut } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 
 import UserAvt from '../user-avt/user-avt.component';
 
 const Header = ({ isSignedIn, setData }) => {
+
+    const auth = getAuth()
+    const user = auth.currentUser
+    const db = getFirestore()
+    let userName = null
+    if (user) {
+        const {uid} = user
+        const userRef = doc(db, "users", uid)
+        getDoc(userRef).then((snapshot) => {
+            userName = snapshot.data().userName
+        })
+    }
+
+    const location = useLocation()
+
+    document.addEventListener(('click'), (e) => {
+        const clickTarget = e.target.className.split(" ")[0]
+        if (clickTarget !== "nav-redirect" && clickTarget !== "user-avt") {
+            setToggleUserNav(false)
+        }
+    })
 
     const navigate = useNavigate()
 
@@ -46,6 +72,15 @@ const Header = ({ isSignedIn, setData }) => {
         navigate("/login")
     }
 
+    const handleProfileRedirect = () => {
+        const pathname = location.pathname
+        if (pathname !== `/${userName}`) {
+            navigate(`/${userName}`)
+        } else {
+            setToggleUserNav(false)
+        }
+    }
+
     return (
         <div className='header'>
             <div className='container'>
@@ -64,9 +99,28 @@ const Header = ({ isSignedIn, setData }) => {
                     </div>
                 }
 
-                {isSignedIn &&
+                    {isSignedIn &&
                     <div className={`${toggleUserNav && 'appear'} user-nav`}>
-                        <LogOutBtn className='nav log-out' onClick={() => { handleSignOut() }} />
+                        <div className='nav-redirect nav' onClick={() => {handleProfileRedirect()}}>
+                            <ProfileBtn className='icon'/>
+                            <p className='nav-link'>Profile</p>
+                        </div>
+                        <div className='nav-redirect nav'>
+                            <SavedBtn className='icon'/>
+                            <p className='nav-link'>Saved</p>
+                        </div>
+                        <div className='nav-redirect nav'>
+                            <SettingsBtn className='icon'/>
+                            <p className='nav-link'>Settings</p>
+                        </div>
+                        <div className='nav-redirect nav'>
+                            <SwitchBtn className='icon'/>
+                            <p className='nav-link'>Switch accounts</p>
+                        </div>
+                        <div className='nav-redirect nav nav-log-out' onClick={() => { handleSignOut() }}>
+                            <LogOutBtn className='icon'/>
+                            <p className='nav-link'>Sign out</p>
+                        </div>
                     </div>}
             </div>
         </div>
