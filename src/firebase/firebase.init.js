@@ -49,6 +49,7 @@ export const createUserCredentials = async (userCredentials, additionalData) => 
 
 export const uploadUserData = async (user, fileCollection, file, fileName, isUploadingAvatar) => {
   if(!user) {
+    console.log("No permission")
     return
   }
   // Get user data

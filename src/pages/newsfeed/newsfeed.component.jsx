@@ -1,39 +1,9 @@
-import { useEffect } from 'react';
-
 import './newsfeed.styles.scss';
-
-import { useNavigate } from 'react-router';
-
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 import { connect } from 'react-redux';
 import { setSignInState } from '../../redux/signInState/signInState.actions';
 
 const NewsFeed = ({isSignedIn, setSignInState}) => {
-
-    let navigate = useNavigate()
-
-    const auth = getAuth();
-   
-    useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in, see docs for a list of available properties
-                // https://firebase.google.com/docs/reference/js/firebase.User
-                const uid = user.uid;
-                navigate("/", {replace: true})
-                setSignInState(true)
-                console.log('signed in')
-                // ...
-            } else {
-                // User is signed out
-                navigate("/login", {replace: true})
-                setSignInState(false)
-                console.log('signed out')
-                // ...
-            }
-        });
-    }, [auth, navigate, setSignInState])
 
     return (
         <div className='newsfeed'>

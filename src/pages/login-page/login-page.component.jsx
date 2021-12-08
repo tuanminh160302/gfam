@@ -27,20 +27,11 @@ const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userN
             if (user) {
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
-                const uid = user.uid;
                 navigate("/", {replace: true})
-                setSignInState(true)
-                console.log('signed in')
-                // ...
-            } else {
-                // User is signed out
-                navigate("/login", {replace: true})
-                setSignInState(false)
-                console.log('signed out')
                 // ...
             }
         });
-    }, [auth, navigate, setSignInState])
+    }, [auth])
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()

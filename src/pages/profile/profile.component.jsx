@@ -1,23 +1,26 @@
 import './profile.styles.scss';
 import { uploadUserData } from '../../firebase/firebase.init';
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAuth } from 'firebase/auth'
 
 const Profile = () => {
 
-    const handleSubmitFile = (e) => {
+    const auth = getAuth();
+    const user = auth.currentUser
 
-    }
+    let file = null
+    let fileName = null
 
     const handleFileChange = (e) => {
         e.preventDefault()
 
-        const auth = getAuth();
-        const user = auth.currentUser
-        console.log(user)
+        file = e.target.files[0]
+        fileName = file.name
+    }
 
-        const file = e.target.files[0]
-        const fileName = file.name
+    const handleSubmitFile = (e) => {
+        e.preventDefault()
+
         console.log(fileName)
         uploadUserData(user, 'avatars', file, fileName, true)
     }

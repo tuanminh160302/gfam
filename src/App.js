@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import './App.scss';
 
 import { connect } from 'react-redux';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -15,6 +15,15 @@ import NewsFeed from './pages/newsfeed/newsfeed.component';
 import Profile from './pages/profile/profile.component';
 
 const App = ({isSignedIn, setSignInState}) => {
+
+  const location = useLocation()
+  const pathname = location.pathname
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log(pathname)
+    console.log("re-render")
+  }, [pathname])
 
   const auth = getAuth();
  
@@ -33,7 +42,7 @@ const App = ({isSignedIn, setSignInState}) => {
               // ...
           }
       });
-  }, [auth, setSignInState])
+  }, [auth, setSignInState, location.pathname])
 
   return (
     <div className="App">

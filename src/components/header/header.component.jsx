@@ -10,9 +10,13 @@ import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 
+import { useNavigate } from 'react-router';
+
 import UserAvt from '../user-avt/user-avt.component';
 
 const Header = ({ isSignedIn, setData }) => {
+
+    const navigate = useNavigate()
 
     const [toggleUserNav, setToggleUserNav] = useState(false);
 
@@ -32,9 +36,14 @@ const Header = ({ isSignedIn, setData }) => {
                 setData(dataObject)
                 setToggleUserNav(false)
             }
+            navigate("/login")
         }).catch((error) => {
             // An error happened.
         });
+    }
+
+    const handleSignInRedirect = () => {
+        navigate("/login")
     }
 
     return (
@@ -51,7 +60,7 @@ const Header = ({ isSignedIn, setData }) => {
                         <UserAvt className='user-avt' onClick={() => { handleToggleUserNav() }}/>
                     </div>
                     : <div className='header-nav'>
-
+                        <span onClick={() => {handleSignInRedirect()}}>Please sign in</span>
                     </div>
                 }
 
