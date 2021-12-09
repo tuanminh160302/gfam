@@ -46,7 +46,7 @@ const App = ({isSignedIn, setSignInState}) => {
 
   return (
     <div className="App">
-      <Header isLoggedIn={false}/>
+      <Header/>
       <Routes>
         <Route path='/login' element={<LoginPage />}></Route>
         <Route path='/' element={<NewsFeed />}></Route>

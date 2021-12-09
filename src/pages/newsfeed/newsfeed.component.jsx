@@ -3,7 +3,17 @@ import './newsfeed.styles.scss';
 import { connect } from 'react-redux';
 import { setSignInState } from '../../redux/signInState/signInState.actions';
 
-const NewsFeed = ({isSignedIn, setSignInState}) => {
+import { getFirestore, doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
+
+const NewsFeed = ({ isSignedIn, setSignInState }) => {
+
+    const db = getFirestore();    
+
+    const handleGetUsers = () => {
+        // collection(db, 'users').then((snapshot) => {
+        //     snapshot.docs
+        // })
+    }
 
     return (
         <div className='newsfeed'>
@@ -14,12 +24,12 @@ const NewsFeed = ({isSignedIn, setSignInState}) => {
                     </div>
 
                     <div className='con posts'>
-                        
+
                     </div>
                 </div>
 
                 <div className='right-con'>
-                    <div className='con user'>
+                    <div className='con user' onClick={(() => { handleGetUsers() })}>
 
                     </div>
 
@@ -32,12 +42,12 @@ const NewsFeed = ({isSignedIn, setSignInState}) => {
     )
 }
 
-const mapStateToProps = ({isSignedIn}) => ({
+const mapStateToProps = ({ isSignedIn }) => ({
     isSignedIn: isSignedIn.isSignedIn
-  })
-  
-  const mapDispatchToProps = (dispatch) => ({
-    setSignInState: (isSignedIn) => {dispatch(setSignInState(isSignedIn))}
-  })
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(NewsFeed);
+})
+
+const mapDispatchToProps = (dispatch) => ({
+    setSignInState: (isSignedIn) => { dispatch(setSignInState(isSignedIn)) }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewsFeed);

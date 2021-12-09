@@ -27,9 +27,16 @@ const Header = ({ isSignedIn, setData }) => {
     let userName = null
     if (user) {
         const {uid} = user
+        console.log(uid)
         const userRef = doc(db, "users", uid)
         getDoc(userRef).then((snapshot) => {
-            userName = snapshot.data().userName
+            if (snapshot.data()) {
+                userName = snapshot.data().userName
+                console.log(userName)
+            }
+        })
+        .catch((error) => {
+            console.log(error)
         })
     }
 

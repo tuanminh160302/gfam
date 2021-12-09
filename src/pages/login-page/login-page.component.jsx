@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
@@ -21,17 +21,20 @@ const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userN
 
     let navigate = useNavigate()
     const auth = getAuth();
+    const [redirect, setRedirect] = useState(false)
  
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
-                navigate("/", {replace: true})
+                if (redirect) {
+                    navigate("/", {replace: true})
+                }
                 // ...
             }
         });
-    }, [auth])
+    }, [auth, redirect])
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()
@@ -86,10 +89,14 @@ const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userN
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
-                const user = userCredential.user;
-                createUserCredentials(user, { email, userName, displayName })
+                const {user} = userCredential;
                 // console.log(user)
-                email = userName = displayName = password = confirmPassword = ''
+                createUserCredentials(user, { email, userName, displayName })
+                .then(() => {
+                    console.log("data created")
+                    email = userName = displayName = password = confirmPassword = ''
+                    setRedirect(true)
+                })
                 // ...
             })
             .catch((error) => {

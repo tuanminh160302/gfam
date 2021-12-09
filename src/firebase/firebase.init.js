@@ -39,8 +39,10 @@ export const createUserCredentials = async (userCredentials, additionalData) => 
     try {
       await setDoc(doc(db, "users", uid), {
         createdAt,
+        uid,
         ...additionalData
       })
+      
     } catch (err) {
       console.log('error creating user', err.message)
     }
