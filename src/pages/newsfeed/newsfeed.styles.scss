@@ -60,6 +60,12 @@
 
             .suggestions {
                 height: 40vh;
+
+                .user-avt {
+                    height: 8vh;
+                    width: 8vh;
+                    border-radius: 50%;
+                }
             }
         }
     }

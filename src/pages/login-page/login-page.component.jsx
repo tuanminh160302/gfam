@@ -15,26 +15,37 @@ import gsap from 'gsap';
 
 import firebaseApp from '../../firebase/firebase.init';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { createUserCredentials } from '../../firebase/firebase.init';
 
 const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userName, displayName, password, confirmPassword, setData }) => {
 
     let navigate = useNavigate()
     const auth = getAuth();
+    const db = getFirestore()
     const [redirect, setRedirect] = useState(false)
  
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in, see docs for a list of available properties
-                // https://firebase.google.com/docs/reference/js/firebase.User
-                if (redirect) {
-                    navigate("/", {replace: true})
-                }
-                // ...
+                const { uid } = user
+                const userRef = doc(db, 'users', uid)
+                getDoc(userRef)
+                .then((snapshot) => {
+                    if (snapshot.data()) {
+                        setRedirect(true)
+                    }
+                    if (redirect) {
+                        navigate("/", {replace: true})
+                    }
+                })
             }
         });
-    }, [auth, redirect])
+
+        return () => {
+            setRedirect(false)
+        }
+    }, [auth, redirect, db, navigate])
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()

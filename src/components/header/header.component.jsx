@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import './header.styles.scss'
 
@@ -25,14 +25,21 @@ const Header = ({ isSignedIn, setData }) => {
     const user = auth.currentUser
     const db = getFirestore()
     let userName = null
+    const navigate = useNavigate()
+    const [toggleUserNav, setToggleUserNav] = useState(false);
+    const location = useLocation()
+    const pathname = location.pathname
+
+    useEffect(() => {
+        setToggleUserNav(false)
+    }, [pathname])
+
     if (user) {
         const {uid} = user
-        console.log(uid)
         const userRef = doc(db, "users", uid)
         getDoc(userRef).then((snapshot) => {
             if (snapshot.data()) {
                 userName = snapshot.data().userName
-                console.log(userName)
             }
         })
         .catch((error) => {
@@ -40,18 +47,12 @@ const Header = ({ isSignedIn, setData }) => {
         })
     }
 
-    const location = useLocation()
-
     document.addEventListener(('click'), (e) => {
         const clickTarget = e.target.className.split(" ")[0]
         if (clickTarget !== "nav-redirect" && clickTarget !== "user-avt") {
             setToggleUserNav(false)
         }
     })
-
-    const navigate = useNavigate()
-
-    const [toggleUserNav, setToggleUserNav] = useState(false);
 
     const handleToggleUserNav = () => {
         setToggleUserNav(!toggleUserNav)
@@ -71,7 +72,7 @@ const Header = ({ isSignedIn, setData }) => {
             }
             navigate("/login")
         }).catch((error) => {
-            // An error happened.
+            console.log(error)
         });
     }
 
@@ -80,7 +81,6 @@ const Header = ({ isSignedIn, setData }) => {
     }
 
     const handleProfileRedirect = () => {
-        const pathname = location.pathname
         if (pathname !== `/${userName}`) {
             navigate(`/${userName}`)
         } else {
@@ -99,7 +99,7 @@ const Header = ({ isSignedIn, setData }) => {
                     onClick={() => {handleSignOut()}}
                 /> */}
                         {/* <img src={} alt="" className="user-avt" onClick={() => { handleToggleUserNav() }} /> */}
-                        <UserAvt className='user-avt' onClick={() => { handleToggleUserNav() }}/>
+                        <UserAvt className='user-avt' self={true} onClick={() => { handleToggleUserNav() }}/>
                     </div>
                     : <div className='header-nav'>
                         <span onClick={() => {handleSignInRedirect()}}>Please sign in</span>

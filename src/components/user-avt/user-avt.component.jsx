@@ -2,7 +2,7 @@ import './user-avt.styles.scss'
 
 import { getAuth } from 'firebase/auth';
 
-const UserAvt = ({onClick, className}) => {
+const UserAvt = ({onClick, className, self, src}) => {
 
     const auth = getAuth();
     const user = auth.currentUser;
@@ -14,7 +14,7 @@ const UserAvt = ({onClick, className}) => {
 
     return (
         <>
-            <img className={className} src={url} alt="" onClick={onClick}/>
+            <img className={className} src={self ? url : src} alt="" onClick={onClick}/>
         </>
     )
 }
