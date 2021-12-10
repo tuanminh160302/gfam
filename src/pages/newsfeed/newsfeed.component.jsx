@@ -4,14 +4,18 @@ import './newsfeed.styles.scss';
 
 import { connect } from 'react-redux';
 import { setSignInState } from '../../redux/signInState/signInState.actions';
+import { useNavigate } from 'react-router-dom';
 
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth'
 
 import UserAvt from '../../components/user-avt/user-avt.component';
 
 const NewsFeed = ({ isSignedIn, setSignInState }) => {
 
+    const navigate = useNavigate()
     const db = getFirestore();    
+    const auth = getAuth();
     const userCollectionRef = collection(db, 'users')
     const hasFetchData = useRef(false)
 
@@ -20,23 +24,60 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
         getDocs(queryAllUser).then((querySnapshot) => {
             const suggestionsUsers = []
             querySnapshot.forEach((snapshot) => {
-                const avatarURL = snapshot.data().avatarURL
-                suggestionsUsers.push(avatarURL)
+                const data = snapshot.data()
+                const userName = data.userName
+                const displayName = data.displayName
+                const avatarURL = data.avatarURL
+                const userData = {
+                    userName,
+                    displayName,
+                    avatarURL
+                }
+                suggestionsUsers.push(userData)
             })
             const content = 
-            <div>
-                {suggestionsUsers.map((user, index) => {
+            <>
+                {suggestionsUsers.map((userData, index) => {
                     return (
-                        <Fragment key={index}>
-                            <UserAvt className='user-avt' self={false} src={user}/>
-                        </Fragment>
+                        <div key={index} className='user-data'>
+                            <UserAvt className='user-avt' self={false} src={userData.avatarURL}/>
+                            <div className='user-info'>
+                                <p className='user-name' onClick={() => {navigate(`/${userData.userName}`)}}>{userData.userName}</p>
+                                <p className='display-name'>{userData.displayName}</p>
+                            </div>
+                        </div>
                     )
                 })}
-            </div>
+            </>
 
             ReactDOM.render(content, document.getElementById('suggestions'))
         })
     }, [userCollectionRef])
+
+    const memoizedFetchCurrUser = useCallback(() => {
+        const user = auth.currentUser
+        console.log(user)
+        if (user) {
+            const {uid} = user
+            const userRef = doc(db, "users", uid)
+            getDoc(userRef).then((snapshot) => {
+                const data = snapshot.data()
+                const userName = data.userName
+                const displayName = data.displayName
+
+                const content = 
+                <div className='user-data'>
+                    <UserAvt className='user-avt' self={true}/>
+                    <div className='user-info'>
+                        <p className='user-name' onClick={() => {navigate(`/${userName}`)}}>{userName}</p>
+                        <p className='display-name'>{displayName}</p>
+                    </div>
+                </div>
+
+                ReactDOM.render(content, document.getElementById('user'))
+            })
+        }
+    }, [auth])
 
     useEffect(() => {
         if (!hasFetchData.current) {
@@ -44,7 +85,10 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
 
             memoizedFetchSuggestions()
         }
-    }, [memoizedFetchSuggestions])
+
+        memoizedFetchCurrUser()
+
+    }, [memoizedFetchSuggestions, memoizedFetchCurrUser])
 
     return (
         <div className='newsfeed'>
@@ -60,7 +104,7 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
                 </div>
 
                 <div className='right-con'>
-                    <div className='con user' id='users'>
+                    <div className='con user' id='user'>
 
                     </div>
 

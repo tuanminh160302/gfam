@@ -14,12 +14,13 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
+import { setSignInState } from '../../redux/signInState/signInState.actions';
 
 import { useNavigate, useLocation } from 'react-router';
 
 import UserAvt from '../user-avt/user-avt.component';
 
-const Header = ({ isSignedIn, setData }) => {
+const Header = ({ isSignedIn, setData, setSignInState }) => {
 
     const auth = getAuth()
     const user = auth.currentUser
@@ -70,14 +71,16 @@ const Header = ({ isSignedIn, setData }) => {
                 setData(dataObject)
                 setToggleUserNav(false)
             }
-            navigate("/login")
+            setSignInState(false)
         }).catch((error) => {
             console.log(error)
         });
     }
 
     const handleSignInRedirect = () => {
-        navigate("/login")
+        if (pathname !== '/') {
+            navigate("/")
+        }
     }
 
     const handleProfileRedirect = () => {
@@ -139,7 +142,8 @@ const mapStateToProps = ({ isSignedIn }) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    setData: (data) => { dispatch(getInputValue(data)) }
+    setData: (data) => { dispatch(getInputValue(data)) },
+    setSignInState: (isSignedIn) => {dispatch(setSignInState(isSignedIn))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

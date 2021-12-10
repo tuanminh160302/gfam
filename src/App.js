@@ -7,6 +7,8 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
+import { getFirestore, doc, onSnapshot} from 'firebase/firestore';
+
 import { setSignInState } from './redux/signInState/signInState.actions'
 
 import Header from './components/header/header.component';
@@ -16,24 +18,21 @@ import Profile from './pages/profile/profile.component';
 
 const App = ({isSignedIn, setSignInState}) => {
 
-  const location = useLocation()
-  const pathname = location.pathname
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    console.log(pathname)
-    console.log("re-render")
-  }, [pathname])
-
   const auth = getAuth();
+  const db = getFirestore();
  
   useEffect(() => {
       onAuthStateChanged(auth, (user) => {
           if (user) {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
-              setSignInState(true)
-              console.log('signed in')
+              const {uid} = user
+              const data = onSnapshot(doc(db, 'users', uid), (doc) => {
+                if (doc.data()) {
+                  setSignInState(true)
+                  console.log('signed in')
+                }
+              })
               // ...
           } else {
               // User is signed out
@@ -42,14 +41,15 @@ const App = ({isSignedIn, setSignInState}) => {
               // ...
           }
       });
-  }, [auth, setSignInState, location.pathname])
+  }, [auth, setSignInState, db])
 
   return (
     <div className="App">
       <Header/>
       <Routes>
-        <Route path='/login' element={<LoginPage />}></Route>
-        <Route path='/' element={<NewsFeed />}></Route>
+        <Route path='/' element={isSignedIn===false ? <LoginPage /> : <NewsFeed />}></Route>
+        {/* <Route path='/login' element={<LoginPage />}></Route>
+        <Route path='/' element={<NewsFeed />}></Route> */}
         <Route path='/:username' element={<Profile />}></Route>
       </Routes>
     </div>

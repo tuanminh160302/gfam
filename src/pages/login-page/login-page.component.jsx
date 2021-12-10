@@ -3,7 +3,6 @@ import './login-page.styles.scss';
 import FormInput from '../../form-input/form-input.component';
 
 import { connect } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 import { setInputField } from '../../redux/signInState/signInState.actions';
@@ -15,37 +14,9 @@ import gsap from 'gsap';
 
 import firebaseApp from '../../firebase/firebase.init';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { createUserCredentials } from '../../firebase/firebase.init';
 
 const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userName, displayName, password, confirmPassword, setData }) => {
-
-    let navigate = useNavigate()
-    const auth = getAuth();
-    const db = getFirestore()
-    const [redirect, setRedirect] = useState(false)
- 
-    useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const { uid } = user
-                const userRef = doc(db, 'users', uid)
-                getDoc(userRef)
-                .then((snapshot) => {
-                    if (snapshot.data()) {
-                        setRedirect(true)
-                    }
-                    if (redirect) {
-                        navigate("/", {replace: true})
-                    }
-                })
-            }
-        });
-
-        return () => {
-            setRedirect(false)
-        }
-    }, [auth, redirect, db, navigate])
 
     const loginFormRef = useRef()
     const signUpFormRef = useRef()
@@ -106,7 +77,7 @@ const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userN
                 .then(() => {
                     console.log("data created")
                     email = userName = displayName = password = confirmPassword = ''
-                    setRedirect(true)
+                    setSignInState(true)
                 })
                 // ...
             })
@@ -125,7 +96,7 @@ const LoginPage = ({ setSignInState, inputFieldType, setInputField, email, userN
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
-                const user = userCredential.user;
+                setSignInState(true)
                 // ...
             })
             .catch((error) => {
