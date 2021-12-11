@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import './App.scss';
 
 import { connect } from 'react-redux';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -27,7 +27,7 @@ const App = ({isSignedIn, setSignInState}) => {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
               const {uid} = user
-              const data = onSnapshot(doc(db, 'users', uid), (doc) => {
+              onSnapshot(doc(db, 'users', uid), (doc) => {
                 if (doc.data()) {
                   setSignInState(true)
                   console.log('signed in')

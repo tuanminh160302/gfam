@@ -16,6 +16,7 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
     const navigate = useNavigate()
     const db = getFirestore();    
     const auth = getAuth();
+    const currUser = auth.currentUser;
     const userCollectionRef = collection(db, 'users')
     const hasFetchData = useRef(false)
 
@@ -56,7 +57,6 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
 
     const memoizedFetchCurrUser = useCallback(() => {
         const user = auth.currentUser
-        console.log(user)
         if (user) {
             const {uid} = user
             const userRef = doc(db, "users", uid)
@@ -77,18 +77,20 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
                 ReactDOM.render(content, document.getElementById('user'))
             })
         }
-    }, [auth])
+    }, [auth, db, navigate])
 
     useEffect(() => {
-        if (!hasFetchData.current) {
-            hasFetchData.current = true
-
-            memoizedFetchSuggestions()
+        if (currUser) {
+            if (!hasFetchData.current) {
+                hasFetchData.current = true
+    
+                memoizedFetchSuggestions()
+            }
+    
+            memoizedFetchCurrUser()
         }
 
-        memoizedFetchCurrUser()
-
-    }, [memoizedFetchSuggestions, memoizedFetchCurrUser])
+    }, [memoizedFetchSuggestions, memoizedFetchCurrUser, currUser ])
 
     return (
         <div className='newsfeed'>

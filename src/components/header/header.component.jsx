@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState} from 'react';
 
 import './header.styles.scss'
 
@@ -7,10 +7,13 @@ import { ReactComponent as ProfileBtn } from '../../assets/media/profile.svg';
 import { ReactComponent as SavedBtn } from '../../assets/media/saved.svg';
 import { ReactComponent as SettingsBtn } from '../../assets/media/settings.svg';
 import { ReactComponent as SwitchBtn } from '../../assets/media/switch.svg';
+import { ReactComponent as HomeBtn } from '../../assets/media/home.svg';
+import { ReactComponent as CreateBtn } from '../../assets/media/create.svg';
 
 import Button from '../button/button.component';
 import { getAuth, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { uploadUserPost } from '../../firebase/firebase.init';
 import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
@@ -19,6 +22,8 @@ import { setSignInState } from '../../redux/signInState/signInState.actions';
 import { useNavigate, useLocation } from 'react-router';
 
 import UserAvt from '../user-avt/user-avt.component';
+
+import gsap from 'gsap';
 
 const Header = ({ isSignedIn, setData, setSignInState }) => {
 
@@ -30,6 +35,8 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
     const [toggleUserNav, setToggleUserNav] = useState(false);
     const location = useLocation()
     const pathname = location.pathname
+
+    const [createPost, setCreatePost] = useState(false)
 
     useEffect(() => {
         setToggleUserNav(false)
@@ -49,9 +56,11 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
     }
 
     document.addEventListener(('click'), (e) => {
-        const clickTarget = e.target.className.split(" ")[0]
-        if (clickTarget !== "nav-redirect" && clickTarget !== "user-avt") {
-            setToggleUserNav(false)
+        if (e.target.nodeName !== 'path' && e.target.nodeName !== 'svg') {
+            const clickTarget = e.target.className.split(" ")[0]
+            if (clickTarget !== "nav-redirect" && clickTarget !== "user-avt") {
+                setToggleUserNav(false)
+            }
         }
     })
 
@@ -80,6 +89,8 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
     const handleSignInRedirect = () => {
         if (pathname !== '/') {
             navigate("/")
+        } else {
+            window.location.reload()
         }
     }
 
@@ -91,21 +102,51 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         }
     }
 
+    const handleCreatePost = () => {
+        setCreatePost(true)
+        gsap.to('.new-post', {scale: 1, opacity: 1, duration: .15})
+        gsap.to('body', {overflow: 'hidden'})
+    }
+
+    const handleExitCreatePost = () => {
+        setCreatePost(false)
+        gsap.to('.new-post', {scale: 1.1, opacity: 0, duration: .15})
+        gsap.to('body', {overflow: 'auto'})
+    }
+
+    let fileList = null;
+
+    const handleSubmitFile = (e) => {
+        e.preventDefault()
+
+        fileList.forEach((file) => console.log(file.name))
+
+        if (user) {
+            uploadUserPost(user, fileList, "first ever post").then(() => {
+                console.log("Successfully created the post")
+            })
+        }
+    }
+
+    const handleFileChange = (e) => {
+        e.preventDefault()
+
+        fileList = Object.values(e.target.files)
+    }   
+
     return (
         <div className='header'>
             <div className='container'>
                 {isSignedIn
-                    ? <div className='header-nav'>
-                        {/* <Button 
-                    className='sign-out-btn'
-                    text='Sign Out'
-                    onClick={() => {handleSignOut()}}
-                /> */}
-                        {/* <img src={} alt="" className="user-avt" onClick={() => { handleToggleUserNav() }} /> */}
+                    ? 
+                    <div className='header-nav'>
+                        <HomeBtn className='icon' onClick={() => {handleSignInRedirect()}}/>
+                        <CreateBtn className='icon' onClick={() => {handleCreatePost()}}/>
                         <UserAvt className='user-avt' self={true} onClick={() => { handleToggleUserNav() }}/>
                     </div>
-                    : <div className='header-nav'>
-                        <span onClick={() => {handleSignInRedirect()}}>Please sign in</span>
+                    : 
+                    <div className='header-nav'>
+                        <HomeBtn className='icon' onClick={() => {handleSignInRedirect()}}/>
                     </div>
                 }
 
@@ -132,6 +173,16 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
                             <p className='nav-link'>Sign out</p>
                         </div>
                     </div>}
+
+                    <div className={`${!createPost ? 'hidden' : null} new-post-container`}>
+                        <div className="new-post-exit" onClick={() => {handleExitCreatePost()}}></div>
+                        <div className="new-post">
+                            <form onSubmit={(e) => { handleSubmitFile(e) }}>
+                                <input type="file" multiple onChange={(e) => { handleFileChange(e) }} />
+                                <button type='submit'>Upload</button>
+                            </form>
+                        </div>
+                    </div>
             </div>
         </div>
     )
