@@ -146,19 +146,10 @@
                         position: absolute;
                         top: 0;
                         left: 0;
-                        display: none;
+                        // display: none;
                         user-select: none;
                         border-radius: 50px;
                         z-index: 10;
-                        display: none;
-
-                        .cropper-container {
-                            border-radius: 50px
-                        }
-
-                        .crop-area {
-                            overflow: hidden;
-                        }
                     }
 
                     .preview-img {
@@ -188,14 +179,6 @@
                     //     &.show {
                     //         display: block;
                     //     }
-                    // }
-
-                    // .cropper-container {
-                    //     border-radius: 50px
-                    // }
-
-                    // .crop-area {
-                    //     overflow: hidden;
                     // }
 
                     .change-img {

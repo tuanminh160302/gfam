@@ -14,6 +14,7 @@ import { ReactComponent as HomeBtn } from '../../assets/media/home.svg';
 import { ReactComponent as CreateBtn } from '../../assets/media/create.svg';
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
+import CropperComponent from '../cropper/cropper.component';
 
 import Button from '../button/button.component';
 import { getAuth, signOut } from "firebase/auth";
@@ -124,6 +125,7 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         setFileList([])
         setShowNext(true)
         setShowBack(false)
+        setCropperSrc()
         gsap.to('.new-post', { scale: 1.1, opacity: 0, duration: .15 })
         gsap.to('body', { overflow: 'auto' })
     }
@@ -193,75 +195,20 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         }
     }, [fileList])
 
-    const [crop, setCrop] = useState({ x: 0, y: 0 })
-    const [zoom, setZoom] = useState(1)
-
-    const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-        console.log(croppedArea, croppedAreaPixels)
-    }, [])
-
-    const [verticalOrientation, setVerticalOrientation] = useState(null)
-
     const images = fileList.map((file, index) => {
-        const image = new Image()
-        image.src = URL.createObjectURL(file)
-        image.onload = () => {
-            if (image.height > image.width) {
-                setVerticalOrientation(true)
-            } else if (image.height < image.width) {
-                setVerticalOrientation(false)
-            }
-        }
-
         return (
-            // <div key={file.name} className={`${index === 0 ? 'show' : null} preview-img`}>
-            //     <Cropper
-            //         image={file.preview}
-            //         crop={crop}
-            //         zoom={zoom}
-            //         aspect={4 / 3}
-            //         onCropChange={setCrop}
-            //         onCropComplete={onCropComplete}
-            //         onZoomChange={setZoom}
-            //         classes={
-            //             {
-            //                 containerClassName: 'cropper-container',
-            //                 cropAreaClassName: 'crop-area'
-            //             }
-            //         }
-            //         objectFit={verticalOrientation ? 'horizontal-cover' : 'vertical-cover'}
-            //         restrictPosition={true}
-            //     />
-            // </div>
             <img className={`${index === 0 ? 'show' : null} preview-img`} key={file.name} src={file.preview} alt={file.name} />
         )
     })
+
+    const [cropperSrc, setCropperSrc] = useState()
 
     const handleEditImage = () => {
         let images = imagesRef.current.children
         for (let i = 0; i < images.length - 2; i++) {
             if (images[i].className.includes('show')) {
-                const cropper = 
-                <Cropper
-                    image={images[i].url}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={4 / 3}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
-                    classes={
-                        {
-                            containerClassName: 'cropper-container',
-                            cropAreaClassName: 'crop-area'
-                        }
-                    }
-                    objectFit={verticalOrientation ? 'horizontal-cover' : 'vertical-cover'}
-                    restrictPosition={true}
-                />
-                
-                ReactDOM.render(cropper, document.getElementById('cropper'))
-                gsap.to(cropperRef.current, {display: 'block'})
+                setCropperSrc(images[i].src)
+                // gsap.to(cropperRef.current, {display: 'block'})
                 return
             }
         }
@@ -358,7 +305,11 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
                                 {images}
                                 <NextBtn className={`${!showNext && 'hide'} change-img next`} onClick={() => { handleNextImg() }} />
                                 <BackBtn className={`${!showBack && 'hide'} change-img back`} onClick={() => { handlePrevImg() }} />
-                                <div className='cropper' id='cropper' ref={cropperRef}></div>
+                                {cropperSrc ?
+                                <div className='cropper' id='cropper' ref={cropperRef}>
+                                    <CropperComponent src={cropperSrc}/>:
+                                </div> :
+                                null}
                             </div>
                         }
 
