@@ -11,12 +11,15 @@
     "gsap": "^3.8.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-dropzone": "^11.4.2",
+    "react-easy-crop": "^4.0.1",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
     "react-scripts": "^4.0.3",
     "redux": "^4.1.2",
     "redux-logger": "^3.0.6",
     "sass": "^1.44.0",
+    "styled-components": "^5.3.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

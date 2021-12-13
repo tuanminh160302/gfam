@@ -90,7 +90,7 @@ const NewsFeed = ({ isSignedIn, setSignInState }) => {
             memoizedFetchCurrUser()
         }
 
-    }, [memoizedFetchSuggestions, memoizedFetchCurrUser, currUser ])
+    }, [memoizedFetchSuggestions, memoizedFetchCurrUser, currUser  ])
 
     return (
         <div className='newsfeed'>

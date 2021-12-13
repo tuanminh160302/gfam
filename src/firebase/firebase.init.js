@@ -96,6 +96,11 @@ export const uploadUserPost = async (user, fileList, caption) => {
   if (!user) {
     return
   }
+
+  if (fileList.length === 0) {
+    return
+  }
+
   // Set up file collection
   const fileCollection = 'posts'
   // Get the time of upload
