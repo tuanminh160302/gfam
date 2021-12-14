@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, useRef, Fragment } from 'react';
 import ReactDOM from 'react-dom'
 import { useDropzone } from 'react-dropzone';
-import Cropper from 'react-easy-crop';
 
 import './header.styles.scss'
 
@@ -24,6 +23,7 @@ import { connect } from 'react-redux';
 
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 import { setSignInState } from '../../redux/signInState/signInState.actions';
+import { setCropper } from '../../redux/cropImage/cropImage.actions';
 
 import { useNavigate, useLocation } from 'react-router';
 
@@ -31,7 +31,7 @@ import UserAvt from '../user-avt/user-avt.component';
 
 import gsap from 'gsap';
 
-const Header = ({ isSignedIn, setData, setSignInState }) => {
+const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, setCropper }) => {
 
     const auth = getAuth()
     const user = auth.currentUser
@@ -126,6 +126,7 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         setShowNext(true)
         setShowBack(false)
         setCropperSrc()
+        setCropper(false)
         gsap.to('.new-post', { scale: 1.1, opacity: 0, duration: .15 })
         gsap.to('body', { overflow: 'auto' })
     }
@@ -195,9 +196,21 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         }
     }, [fileList])
 
+    useEffect(() => {
+        if (imagesRef.current) {
+            let images = imagesRef.current.children
+            for (let i = 0; i < images.length - 2; i++) {
+                if (images[i].className.includes('show')) {
+                    images[i].src = cropImage
+                    return
+                }
+            }
+        }
+    }, [cropImage])
+
     const images = fileList.map((file, index) => {
         return (
-            <img className={`${index === 0 ? 'show' : null} preview-img`} key={file.name} src={file.preview} alt={file.name} />
+            <img className={`${index === 0 ? 'show' : null} preview-img }`} id={file.name} key={file.name} src={file.preview} alt={file.name}/>
         )
     })
 
@@ -208,7 +221,7 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
         for (let i = 0; i < images.length - 2; i++) {
             if (images[i].className.includes('show')) {
                 setCropperSrc(images[i].src)
-                // gsap.to(cropperRef.current, {display: 'block'})
+                setCropper(true)
                 return
             }
         }
@@ -216,7 +229,8 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
 
     const handleNextImg = () => {
         let images = imagesRef.current.children
-        for (let i = 0; i < images.length - 2; i++) {
+        for (let i = 1; i < images.length - 2; i++) {
+            console.log(i)
             if (images[i].className.includes('show')) {
                 images[i].classList.remove('show')
                 images[i + 1].classList.add('show')
@@ -231,11 +245,12 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
 
     const handlePrevImg = () => {
         let images = imagesRef.current.children
-        for (let i = 0; i < images.length - 2; i++) {
+        for (let i = 1; i < images.length - 2; i++) {
+            console.log(i)
             if (images[i].className.includes('show')) {
                 images[i].classList.remove('show')
                 images[i - 1].classList.add('show')
-                if (i - 1 === 0) {
+                if (i - 2 === 0) {
                     setShowBack(false)
                 }
                 setShowNext(true)
@@ -299,17 +314,17 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
                             <div className='post-content' ref={imagesRef}>
                                 <div className='toolbar'>
                                     <p className='tool'>Back</p>
-                                    <p className='tool' onClick={() => {handleEditImage()}}>Edit</p>
+                                    <p className='tool' onClick={() => { handleEditImage() }}>Edit</p>
                                     <p className='tool'>Next</p>
                                 </div>
                                 {images}
                                 <NextBtn className={`${!showNext && 'hide'} change-img next`} onClick={() => { handleNextImg() }} />
                                 <BackBtn className={`${!showBack && 'hide'} change-img back`} onClick={() => { handlePrevImg() }} />
-                                {cropperSrc ?
-                                <div className='cropper' id='cropper' ref={cropperRef}>
-                                    <CropperComponent src={cropperSrc}/>:
-                                </div> :
-                                null}
+                                {showCropper ?
+                                    <div className='cropper' id='cropper' ref={cropperRef}>
+                                        <CropperComponent src={cropperSrc} />
+                                    </div> :
+                                    null}
                             </div>
                         }
 
@@ -325,13 +340,16 @@ const Header = ({ isSignedIn, setData, setSignInState }) => {
     )
 }
 
-const mapStateToProps = ({ isSignedIn }) => ({
-    isSignedIn: isSignedIn.isSignedIn
+const mapStateToProps = ({ isSignedIn, cropImage }) => ({
+    isSignedIn: isSignedIn.isSignedIn,
+    cropImage: cropImage.cropImage,
+    showCropper: cropImage.showCropper
 })
 
 const mapDispatchToProps = (dispatch) => ({
     setData: (data) => { dispatch(getInputValue(data)) },
-    setSignInState: (isSignedIn) => { dispatch(setSignInState(isSignedIn)) }
+    setSignInState: (isSignedIn) => { dispatch(setSignInState(isSignedIn)) },
+    setCropper: (boolean) => (dispatch(setCropper(boolean)))    
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
