@@ -143,6 +143,16 @@
                         }
                     }
 
+                    .images-container {
+                        height: 100%;
+                        width: 100%;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        background: transparent;
+                        border-radius: 50px;
+                    }
+
                     .cropper {
                         height: 100%;
                         width: 100%;
@@ -158,8 +168,8 @@
                     .preview-img {
                         min-height: 30%;
                         min-width: 30%;
-                        max-height: 100%;
-                        max-width: 100%;
+                        max-height: 80%;
+                        max-width: 80%;
                         position: absolute;
                         top: 50%;
                         left: 50%;

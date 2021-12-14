@@ -11,6 +11,7 @@ import gsap from 'gsap';
 
 const CropperComponent = ({ src, getCropImage, setCropper }) => {
 
+    const settingsIconRef = useRef()
     const cropperSettingsRef = useRef()
     const toggleSettings= useRef(false)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -55,9 +56,11 @@ const CropperComponent = ({ src, getCropImage, setCropper }) => {
     const helperToggleCropSettings = () => {
         if (!toggleSettings.current) {
             gsap.to(cropperSettingsRef.current, {duration: 0, opacity: 1, pointerEvents: 'auto'})
+            gsap.to(settingsIconRef.current, {duration: 0.3, rotate: '90deg'})
             toggleSettings.current = true
         } else if (toggleSettings.current) {
             gsap.to(cropperSettingsRef.current, {duration: 0, opacity: 0, pointerEvents: 'none'})
+            gsap.to(settingsIconRef.current, {duration: 0.3, rotate: '0deg'})
             toggleSettings.current = false
         }
     }
@@ -108,7 +111,7 @@ const CropperComponent = ({ src, getCropImage, setCropper }) => {
                 <p className='cropper-tool' onClick={() => {showCroppedImage()}}>Done</p>
             </div>
 
-            <SettingsBtn className='settings-btn' onClick={() => {toggleCropSettings()}}/>
+            <SettingsBtn className='settings-btn' onClick={() => {toggleCropSettings()}} ref={settingsIconRef}/>
             <div className='cropper-settings' ref={cropperSettingsRef}>
                 <p className={`${aspectSelected === '11' && 'aspect-selected'} aspect`} onClick={() => {setAspect11()}}>1 : 1</p>
                 <p className={`${aspectSelected === '45' && 'aspect-selected'} aspect`} onClick={() => {setAspect45()}}>4 : 5</p>

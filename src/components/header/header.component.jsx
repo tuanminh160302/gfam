@@ -199,7 +199,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
     useEffect(() => {
         if (imagesRef.current) {
             let images = imagesRef.current.children
-            for (let i = 0; i < images.length - 2; i++) {
+            for (let i = 0; i < images.length; i++) {
                 if (images[i].className.includes('show')) {
                     images[i].src = cropImage
                     return
@@ -218,7 +218,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
 
     const handleEditImage = () => {
         let images = imagesRef.current.children
-        for (let i = 0; i < images.length - 2; i++) {
+        for (let i = 0; i < images.length; i++) {
             if (images[i].className.includes('show')) {
                 setCropperSrc(images[i].src)
                 setCropper(true)
@@ -229,12 +229,11 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
 
     const handleNextImg = () => {
         let images = imagesRef.current.children
-        for (let i = 1; i < images.length - 2; i++) {
-            console.log(i)
+        for (let i = 0; i < images.length; i++) {
             if (images[i].className.includes('show')) {
                 images[i].classList.remove('show')
                 images[i + 1].classList.add('show')
-                if (i === images.length - 4) {
+                if (i === images.length - 2) {
                     setShowNext(false)
                 }
                 setShowBack(true)
@@ -245,17 +244,26 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
 
     const handlePrevImg = () => {
         let images = imagesRef.current.children
-        for (let i = 1; i < images.length - 2; i++) {
-            console.log(i)
+        for (let i = 0; i < images.length; i++) {
             if (images[i].className.includes('show')) {
                 images[i].classList.remove('show')
                 images[i - 1].classList.add('show')
-                if (i - 2 === 0) {
+                if (i - 1 === 0) {
                     setShowBack(false)
                 }
                 setShowNext(true)
                 return
             }
+        }
+    }
+
+    const handleResetImages = () => {
+        let images = imagesRef.current.children
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i]
+            fileList[i].preview = image.src
+            console.log("img =>", fileList[i].preview)
+            console.log(fileList[i])
         }
     }
 
@@ -311,13 +319,15 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
                             </div>
                             :
                             // null
-                            <div className='post-content' ref={imagesRef}>
+                            <div className='post-content'>
                                 <div className='toolbar'>
                                     <p className='tool'>Back</p>
                                     <p className='tool' onClick={() => { handleEditImage() }}>Edit</p>
-                                    <p className='tool'>Next</p>
+                                    <p className='tool' onClick={() => { handleResetImages()}}>Next</p>
                                 </div>
-                                {images}
+                                <div className='images-container' ref={imagesRef}>
+                                    {images}
+                                </div>
                                 <NextBtn className={`${!showNext && 'hide'} change-img next`} onClick={() => { handleNextImg() }} />
                                 <BackBtn className={`${!showBack && 'hide'} change-img back`} onClick={() => { handlePrevImg() }} />
                                 {showCropper ?
