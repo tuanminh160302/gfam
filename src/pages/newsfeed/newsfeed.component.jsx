@@ -13,6 +13,10 @@ import UserAvt from '../../components/user-avt/user-avt.component';
 
 const NewsFeed = ({ isSignedIn, setSignInState }) => {
 
+    // useEffect(() => {
+    //     window.scrollTo(0, 0)
+    // }, [])
+
     const navigate = useNavigate()
     const db = getFirestore();    
     const auth = getAuth();

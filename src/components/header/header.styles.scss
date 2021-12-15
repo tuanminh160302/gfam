@@ -7,7 +7,7 @@
     align-items: center;
     position: sticky;
     top: 0;
-    height: 10vh;
+    height: 6vh;
     max-width: 100vw;
     background-color: white;
     border-bottom: 2px solid $border-gray;
@@ -15,7 +15,7 @@
 
     .container {
 
-        width: 1248px;
+        width: 935px;
         height: 100%;
         display: flex;
         flex-direction: row;
@@ -40,8 +40,8 @@
             }
     
             .user-avt {
-                height: 4vh;
-                width: 4vh;
+                height: 3vh;
+                width: 3vh;
                 border-radius: 50%;
                 cursor: pointer;
                 padding: 2px;
@@ -50,9 +50,9 @@
 
             .icon {
                 fill: $main;
-                height: 3vh;
-                width: 3vh;
-                margin-right: 25px;
+                height: 2.5vh;
+                width: 2.5vh;
+                margin-right: 20px;
                 cursor: pointer;
             }
         }
@@ -266,7 +266,12 @@
         .user-nav {
             position: absolute;
             right: 0;
-            top: 10vh;
+            bottom: 0;
+            transform: translateY(100%);
+            -webkit-transform: translateY(100%);
+            -moz-transform: translateY(100%);
+            -o-transform: translateY(100%);
+            -ms-transform: translateY(100%);
             background: white;
             height: fit-content;
             width: 300px;
@@ -296,6 +301,16 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+
+                &:nth-child(1) {
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                }
+
+                &:nth-last-child(1) {
+                    border-bottom-left-radius: 10px;
+                    border-bottom-right-radius: 10px;
+                }
 
                 &:hover {
                     background: $hover-gray;

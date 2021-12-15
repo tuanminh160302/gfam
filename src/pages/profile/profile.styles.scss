@@ -1,0 +1,53 @@
+@import '../../assets/uik.styles.scss';
+
+.user-profile {
+    height: 100vh;
+    width: 100%;
+    background: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .profile-container {
+        height: 100%;
+        width: 935px;
+        max-width: 100%;
+        // border: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .profile-user-info {
+            height: fit-content;
+            padding: 20px 70px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            // border-bottom: 1px solid black;
+
+            .profile-user-avt {
+                height: 15vh;
+                width: 15vh;
+                margin-right: 90px;
+                border-radius: 50%;
+                cursor: pointer;
+                padding: 5px;
+                border: 1px solid $border-gray;
+            }
+
+            .profile-user-details {
+                width: fit-content;
+                height: 15vh;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-around;
+
+                .username {
+                    font-size: 1.5rem;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}

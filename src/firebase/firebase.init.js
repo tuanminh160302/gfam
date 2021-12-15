@@ -157,5 +157,21 @@ export const uploadUserPost = async (user, fileList, caption) => {
   })
 }
 
+export const fetchUserPost = async (uid) => {
+  if (!uid) {
+    return
+  }
+
+  const postRef = doc(db, 'posts', uid)
+  getDoc(postRef).then((snapshot) => {
+    if (!snapshot.exists()) {
+      console.log("this user has no post yet")
+    } else if (snapshot.exists()) {
+      const data = snapshot.data()
+      console.log(data)
+    }
+  }).catch((err) => {console.log(err)})
+}
+
 export default firebaseApp;
 
