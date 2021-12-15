@@ -13,6 +13,7 @@ import { ReactComponent as HomeBtn } from '../../assets/media/home.svg';
 import { ReactComponent as CreateBtn } from '../../assets/media/create.svg';
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
+import { ReactComponent as DownBtn } from '../../assets/media/down.svg';
 import CropperComponent from '../cropper/cropper.component';
 
 import Button from '../button/button.component';
@@ -24,6 +25,7 @@ import { connect } from 'react-redux';
 import { getInputValue } from '../../redux/signInData/signInData.actions';
 import { setSignInState } from '../../redux/signInState/signInState.actions';
 import { setCropper } from '../../redux/cropImage/cropImage.actions';
+import { getCropImage } from '../../redux/cropImage/cropImage.actions';
 
 import { useNavigate, useLocation } from 'react-router';
 
@@ -31,7 +33,7 @@ import UserAvt from '../user-avt/user-avt.component';
 
 import gsap from 'gsap';
 
-const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, setCropper }) => {
+const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, setCropper, getCropImage }) => {
 
     const auth = getAuth()
     const user = auth.currentUser
@@ -46,6 +48,9 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
     const [showNext, setShowNext] = useState(true)
     const [showBack, setShowBack] = useState(false)
     const cropperRef = useRef()
+    const textAreaRef = useRef()
+    const captionSizeChange = useRef()
+    const [toggleCaption, setToggleCaption] = useState(false)
 
     const [createPost, setCreatePost] = useState(false)
 
@@ -127,6 +132,8 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
         setShowBack(false)
         setCropperSrc()
         setCropper(false)
+        setToggleCaption(false)
+        setCaption()
         gsap.to('.new-post', { scale: 1.1, opacity: 0, duration: .15 })
         gsap.to('body', { overflow: 'auto' })
     }
@@ -189,7 +196,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
     })
 
     useEffect(() => {
-        console.log('fileList.length =>', fileList.length)
+        console.log('fileList =>', fileList)
         fileList.length ? setToggleDragNDrop(false) : setToggleDragNDrop(true)
         if (fileList.length === 1) {
             setShowBack(false)
@@ -198,11 +205,12 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
     }, [fileList])
 
     useEffect(() => {
-        if (imagesRef.current) {
+        if (imagesRef.current && cropImage) {
             let images = imagesRef.current.children
             for (let i = 0; i < images.length; i++) {
                 if (images[i].className.includes('show')) {
                     images[i].src = cropImage
+                    getCropImage(null)
                     return
                 }
             }
@@ -211,7 +219,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
 
     const images = fileList.map((file, index) => {
         return (
-            <img className={`${index === 0 ? 'show' : null} preview-img }`} id={file.name} key={file.name} src={file.preview} alt={file.name}/>
+            <img className={`${index === 0 ? 'show' : null} preview-img }`} id={file.name} key={file.name} src={file.preview} alt={file.name} />
         )
     })
 
@@ -258,7 +266,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
         }
     }
 
-    const handleResetImages = () => {
+    const handleNextAction = () => {
         let images = imagesRef.current.children
         let filesToUpload = []
         for (let i = 0; i < images.length; i++) {
@@ -267,19 +275,70 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
             const fileName = fileList[i].name
 
             fetch(url)
-            .then(async(response) => {
-                const contentType = response.headers.get('content-type')
-                return await response.blob(), contentType
-            })
-            .then((blob, contentType) => {
-                const fileToUpload = new File([blob], fileName, {type: contentType})
-                filesToUpload.push(fileToUpload)
-                console.log(filesToUpload.length)
-                return filesToUpload.length
-            }).then((resetNum) => {
-                if (resetNum === images.length) {
-                    setFileList(filesToUpload)
+                .then(async (response) => {
+                    const contentType = response.headers.get('content-type')
+                    return [await response.blob(), contentType]
+                })
+                .then(([blob, contentType]) => {
+                    console.log('contentType =>', contentType)
+                    const fileToUpload = new File([blob], fileName, { type: contentType })
+                    filesToUpload.push(fileToUpload)
+                    Object.assign(fileToUpload, { preview: url })
+                    console.log(filesToUpload.length)
+                    return filesToUpload.length
+                }).then((resetNum) => {
+                    if (resetNum === images.length) {
+                        setFileList(filesToUpload)
+                    }
+                })
+        }
+
+        setToggleCaption(true)
+    }
+
+    const handleBackAction = () => {
+        if (!toggleDragNDrop && !toggleCaption) {
+            setToggleDragNDrop(true)
+            setFileList([])
+        } else if (!toggleDragNDrop && toggleCaption) {
+            setToggleCaption(false)
+        }
+    }
+
+    const [captionSmall, setCaptionSmall] = useState(false)
+
+    const handleCaptionDown = () => {
+        if (!captionSmall) {
+            gsap.to(textAreaRef.current, { duration: 0, height: 'fit-content' })
+            gsap.to(captionSizeChange.current, { duration: 0, rotate: '180deg' })
+            setCaptionSmall(true)
+        } else if (captionSmall) {
+            gsap.to(textAreaRef.current, { duration: 0, height: '20vh' })
+            gsap.to(captionSizeChange.current, { duration: 0, rotate: '0' })
+            setCaptionSmall(false)
+        }
+    }
+
+    const [caption, setCaption] = useState()
+
+    const handleTextAreaChange = (e) => {
+        e.preventDefault()
+
+        setCaption(e.target.value)
+    }
+
+    const handlePostAction = () => {
+        handleExitCreatePost()
+        console.log(fileList)
+
+        fileList.forEach((file) => console.log(file.name))
+
+        if (user) {
+            uploadUserPost(user, fileList, caption).then(() => {
+                if (fileList.length) {
+                    console.log("Successfully created the post")
                 }
+                setFileList([])
             })
         }
     }
@@ -327,6 +386,25 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
                 <div className={`${!createPost ? 'hidden' : ''} new-post-container`}>
                     <div className="new-post-exit" onClick={() => { handleExitCreatePost() }}></div>
                     <div className="new-post">
+                        <div className='toolbar'>
+                            {
+                                toggleDragNDrop ?
+                                <p className='tool' onClick={() => {handleExitCreatePost()}}>Cancel</p> :
+                                <p className='tool' onClick={() => {handleBackAction()}}>Back</p>
+                            }
+                            {
+                                toggleDragNDrop ? null :
+                                toggleCaption ?
+                                    <p className='tool'>Add a caption</p> :
+                                    <p className='tool' onClick={() => { handleEditImage() }}>Edit</p>
+                            }
+                            {
+                                toggleDragNDrop ? null :
+                                !toggleCaption ?
+                                <p className='tool' onClick={() => { handleNextAction() }}>Next</p> :
+                                <p className='tool' onClick={() => {handlePostAction()}}>Post</p>
+                            }
+                        </div>
                         {toggleDragNDrop ?
                             <div className='drag-drop' ref={dropZoneRef} {...getRootProps()}>
                                 {isDragActive ?
@@ -337,11 +415,6 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
                             :
                             // null
                             <div className='post-content'>
-                                <div className='toolbar'>
-                                    <p className='tool'>Back</p>
-                                    <p className='tool' onClick={() => { handleEditImage() }}>Edit</p>
-                                    <p className='tool' onClick={() => { handleResetImages()}}>Next</p>
-                                </div>
                                 <div className='images-container' ref={imagesRef}>
                                     {images}
                                 </div>
@@ -360,6 +433,13 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
                             <input type="file" multiple onChange={(e) => { handleFileChange(e) }} />
                             <button type='submit'>Upload</button>
                         </form>
+
+                        {toggleCaption ?
+                            <div className='new-post-caption'>
+                                <textarea className='caption-input' name='caption' placeholder='Add a caption...' ref={textAreaRef} onChange={(e) => {handleTextAreaChange(e)}}></textarea>
+                                <DownBtn className='caption-down' ref={captionSizeChange} onClick={() => { handleCaptionDown() }} />
+                            </div> :
+                            null}
                     </div>
                 </div>
             </div>
@@ -376,7 +456,8 @@ const mapStateToProps = ({ isSignedIn, cropImage }) => ({
 const mapDispatchToProps = (dispatch) => ({
     setData: (data) => { dispatch(getInputValue(data)) },
     setSignInState: (isSignedIn) => { dispatch(setSignInState(isSignedIn)) },
-    setCropper: (boolean) => (dispatch(setCropper(boolean)))    
+    setCropper: (boolean) => (dispatch(setCropper(boolean))),
+    getCropImage: (cropImage) => (dispatch(getCropImage(cropImage))),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

@@ -82,9 +82,9 @@
             }
 
             .new-post {
-                height: 80vh;
-                width: 80vh;
-                max-width: 60%;
+                height: fit-content;
+                width: 75vh;
+                max-width: 58%;
                 background: white;
                 border-radius: 50px;
                 z-index: 2;
@@ -92,8 +92,8 @@
                 opacity: 0;
 
                 .drag-drop {
-                    height: 100%;
-                    width: 100%;
+                    height: 75vh;
+                    width: 75vh;
                     display: flex;
                     flex-direction: row;
                     justify-content: center;
@@ -106,42 +106,44 @@
                     }
                 }
 
-                .post-content {
-                    height: 100%;
+                .toolbar {
                     width: 100%;
+                    height: fit-content;
+                    border-bottom: 2px solid $border-gray;
+                    border-top-left-radius: 50px;
+                    border-top-right-radius: 50px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
                     position: relative;
+                    top: 0;
+                    left: 0;
+                    z-index: 10;
+                    background: white;
 
-                    .toolbar {
-                        width: 100%;
-                        height: fit-content;
-                        border-bottom: 2px solid $border-gray;
-                        border-top-left-radius: 50px;
-                        border-top-right-radius: 50px;
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-between;
-                        position: relative;
-                        z-index: 10;
-                        background: rgba(255,255,255, .8);
+                    .tool {
+                        font-weight: 700;
+                        font-size: 1rem;
+                        margin-top: 25px;
+                        margin-bottom: 15px;
+                        cursor: pointer;
+                        user-select: none;
 
-                        .tool {
-                            font-weight: 600;
-                            font-size: 1rem;
-                            margin-top: 25px;
-                            margin-bottom: 15px;
-                            cursor: pointer;
-                            user-select: none;
+                        &.tool:nth-child(1) {
+                            margin-left: 50px;
+                        }
 
-                            &.tool:nth-child(1) {
-                                margin-left: 50px;
-                            }
-
-                            &.tool:nth-child(3) {
-                                margin-right: 50px;
-                                color: $text-blue;
-                            }
+                        &.tool:nth-child(3) {
+                            margin-right: 50px;
+                            color: $text-blue;
                         }
                     }
+                }
+
+                .post-content {
+                    height: 75vh;
+                    width: 75vh;
+                    position: relative;
 
                     .images-container {
                         height: 100%;
@@ -211,6 +213,52 @@
                     left: 0;
                     z-index: 100;
                     display: none; //remove when build
+                }
+
+                .new-post-caption {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    height: fit-content;
+                    width: 100%;
+                    background: white;
+                    z-index: 2;
+                    border-top: 2px solid black;
+                    border-bottom-left-radius: 50px;
+                    border-bottom-right-radius: 50px;
+                    // transform: scaleY(0);
+                    padding: 20px 20px;
+
+                    .caption-input {
+                        height: 20vh;
+                        box-sizing: border-box;
+                        width: 100%;
+                        font-size: 1rem;
+                        text-align: left;
+                        overflow: auto;
+                        resize: none;
+
+                        border: none;
+                        background: white;
+                        display: block;
+
+                        &:focus {
+                            outline: none;
+                        }
+
+                        &::placeholder {
+                            color: $text-gray;
+                        }
+                    }
+
+                    .caption-down {
+                        height: 3vh;
+                        width: 3vh;
+                        position: absolute;
+                        top: 15px;
+                        right: 20px;
+                        cursor: pointer;
+                    }
                 }
             }
         }
