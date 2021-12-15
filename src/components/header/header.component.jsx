@@ -189,6 +189,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
     })
 
     useEffect(() => {
+        console.log('fileList.length =>', fileList.length)
         fileList.length ? setToggleDragNDrop(false) : setToggleDragNDrop(true)
         if (fileList.length === 1) {
             setShowBack(false)
@@ -259,11 +260,27 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
 
     const handleResetImages = () => {
         let images = imagesRef.current.children
+        let filesToUpload = []
         for (let i = 0; i < images.length; i++) {
             const image = images[i]
-            fileList[i].preview = image.src
-            console.log("img =>", fileList[i].preview)
-            console.log(fileList[i])
+            const url = image.src
+            const fileName = fileList[i].name
+
+            fetch(url)
+            .then(async(response) => {
+                const contentType = response.headers.get('content-type')
+                return await response.blob(), contentType
+            })
+            .then((blob, contentType) => {
+                const fileToUpload = new File([blob], fileName, {type: contentType})
+                filesToUpload.push(fileToUpload)
+                console.log(filesToUpload.length)
+                return filesToUpload.length
+            }).then((resetNum) => {
+                if (resetNum === images.length) {
+                    setFileList(filesToUpload)
+                }
+            })
         }
     }
 
