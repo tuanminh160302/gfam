@@ -402,7 +402,7 @@ const Header = ({ isSignedIn, setData, setSignInState, cropImage, showCropper, s
                                 toggleDragNDrop ? null :
                                 !toggleCaption ?
                                 <p className='tool' onClick={() => { handleNextAction() }}>Next</p> :
-                                <p className='tool' onClick={() => {handlePostAction()}}>Post</p>
+                                <p className='tool' onClick={() => {handlePostAction()}}>Upload</p>
                             }
                         </div>
                         {toggleDragNDrop ?
