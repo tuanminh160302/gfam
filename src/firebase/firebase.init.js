@@ -134,6 +134,7 @@ export const uploadUserPost = async (user, fileList, caption) => {
     await uploadBytes(fileRef, file).then((snapshot) => {
       console.log("Uploaded a blob or file!");
     })
+
     // Update the avatar url in the database
     getDownloadURL(ref(storage, pathToFile))
       .then((url) => {
@@ -148,6 +149,11 @@ export const uploadUserPost = async (user, fileList, caption) => {
             },
           }, { merge: true })
           .then(() => {
+            getDoc(postRef).then((snapshot) => {
+              return Object.keys(snapshot.data()).length - 1
+            }).then((postCount) => {
+              setDoc(userRef, {postCount: postCount}, {merge: true})
+            })
             console.log("Successfully uploaded")
           }).catch(err => console.log(err))
       })
@@ -165,10 +171,10 @@ export const fetchUserPost = async (uid) => {
   const postRef = doc(db, 'posts', uid)
   getDoc(postRef).then((snapshot) => {
     if (!snapshot.exists()) {
-      console.log("this user has no post yet")
+      // console.log("this user has no post yet")
     } else if (snapshot.exists()) {
       const data = snapshot.data()
-      console.log(data)
+      // console.log("this user has", Object.keys(data).length - 1, "post")
     }
   }).catch((err) => {console.log(err)})
 }
