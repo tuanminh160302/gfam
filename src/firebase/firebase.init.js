@@ -168,15 +168,20 @@ export const fetchUserPost = async (uid) => {
     return
   }
 
+  let data = null
+
   const postRef = doc(db, 'posts', uid)
-  getDoc(postRef).then((snapshot) => {
+  await getDoc(postRef).then((snapshot) => {
     if (!snapshot.exists()) {
       // console.log("this user has no post yet")
     } else if (snapshot.exists()) {
-      const data = snapshot.data()
+      data = snapshot.data()
       // console.log("this user has", Object.keys(data).length - 1, "post")
+      // console.log('data =>', data)
     }
   }).catch((err) => {console.log(err)})
+
+  return data
 }
 
 export default firebaseApp;

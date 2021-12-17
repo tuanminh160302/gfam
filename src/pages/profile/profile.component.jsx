@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import './profile.styles.scss';
 import { uploadUserAvatar } from '../../firebase/firebase.init';
 
@@ -27,7 +27,7 @@ const Profile = () => {
     const [editProfileRights, seteditProfileRights] = useState()
     const [toggleEditProfile, setToggleEditProfile] = useState(false)
     const [userToBeDisplayed, setUserToBeDisplayed] = useState()
-
+    const [allPost, setAllPost] = useState([])
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -60,7 +60,18 @@ const Profile = () => {
 
                     setDisplayName(data.displayName)
                     setProfileUserAvt(data.avatarURL)
-                    fetchUserPost(data.uid)
+                    fetchUserPost(data.uid).then((data) => {
+                        const allPost = []
+                        for (let key in data) {
+                            if (key !== 'exist') {
+                                const post = {[key]: data[key]}
+                                allPost.push(post)
+                            }
+                        }
+                        allPost.sort((a,b) => (Object.keys(a) > Object.keys(b) ? -1 : 1))
+                        setAllPost(allPost)
+                    })
+
                     setUserToBeDisplayed(data.userName)
                 })
             } else if (querySnapshot.size === 0) {
@@ -91,6 +102,20 @@ const Profile = () => {
         }
     }
 
+    const posts = allPost.map((post, index) => {
+        const timeStamp = Object.keys(post)[0]
+        const postContent = post[timeStamp]
+        const postDisplayImg = Object.values(postContent['URLS'])[0]
+        console.log(Object.values(postContent['URLS']))
+        return (
+            <div className='post' key={index}>
+                <div className='post-content'>
+                    <img className='post-display-img' src={postDisplayImg} alt="postDisplayImg" />
+                </div>
+            </div>
+        )
+    })
+
     const userContent = (
         <>
             <div className='profile-user-info'>
@@ -104,12 +129,7 @@ const Profile = () => {
                 </div>
             </div>
             <div className='profile-user-post'>
-                <PostPreview className='post'/>
-                <PostPreview className='post'/>
-                <PostPreview className='post'/>
-                <PostPreview className='post'/>
-                <PostPreview className='post'/>
-                <PostPreview className='post'/>
+                {posts}
             </div>
         </>
     )

@@ -1,7 +1,7 @@
 @import '../../assets/uik.styles.scss';
 
 .user-profile {
-    height: 100vh;
+    height: fit-content;
     width: 100%;
     background: white;
     display: flex;
@@ -9,10 +9,9 @@
     justify-content: center;
 
     .profile-container {
-        height: 100%;
+        height: fit-content;
         width: 935px;
         max-width: 100%;
-        border: 1px solid black;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -23,7 +22,6 @@
             width: 100%;
             display: flex;
             flex-direction: row;
-            border-bottom: 1px solid black;
 
             .profile-user-avt {
                 height: 17vh;
@@ -67,10 +65,37 @@
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            justify-content: space-between;
 
             .post {
-                
+                position: relative;
+                border: 1px solid gray;
+                margin: 15px;
+                // flex-grow: .4;
+                flex-basis: calc(100%/3 - 30px);
+
+                &.post:before {
+                    content: '';
+                    display: block;
+                    padding-top: 100%;
+                }
+
+                .post-content {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    height: 100%;
+                    width: 100%;
+
+                    .post-display-img {
+                        object-fit: cover;
+                        height: 100%;
+                        width: 100%;
+                        user-select: none;
+                        cursor: pointer;
+                    }
+                }
             }
         }
     }
