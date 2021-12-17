@@ -105,7 +105,13 @@ const Profile = () => {
     const posts = allPost.map((post, index) => {
         const timeStamp = Object.keys(post)[0]
         const postContent = post[timeStamp]
-        const postDisplayImg = Object.values(postContent['URLS'])[0]
+        const postDisplayImgArray = Object.values(postContent['URLS'])
+        let postDisplayImg = null
+        postDisplayImgArray.map((imgArray, index) => {
+            if (imgArray[1] === 0) {
+                postDisplayImg = imgArray[0]
+            }
+        })
         console.log(Object.values(postContent['URLS']))
         return (
             <div className='post' key={index}>

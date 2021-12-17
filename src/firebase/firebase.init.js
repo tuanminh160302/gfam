@@ -124,7 +124,7 @@ export const uploadUserPost = async (user, fileList, caption) => {
     await setDoc(postRef, { exist: true })
   }
 
-  fileList.forEach(async (file) => {
+  fileList.map(async (file, index) => {
     // Set up
     const fileName = file.name
     const pathToFile = `users/${userName}/${fileCollection}/${createdAt}/${fileName}`
@@ -144,7 +144,7 @@ export const uploadUserPost = async (user, fileList, caption) => {
               caption,
               archive: false,
               URLS: {
-                [url]: url
+                [url]: [url, index]
               }
             },
           }, { merge: true })
