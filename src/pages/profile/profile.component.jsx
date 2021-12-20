@@ -28,6 +28,7 @@ const Profile = () => {
     const [toggleEditProfile, setToggleEditProfile] = useState(false)
     const [userToBeDisplayed, setUserToBeDisplayed] = useState()
     const [allPost, setAllPost] = useState([])
+    const [viewPost, setViewPost] = useState(null)
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -102,6 +103,19 @@ const Profile = () => {
         }
     }
 
+    const handleViewPost = (e) => {
+        e.preventDefault()
+        setViewPost(e.target.alt)
+    }
+
+    const handleExitViewPost = () => {
+        setViewPost(null)
+    }
+
+    const fullPost = (
+        <div>{viewPost}</div>
+    )
+
     const posts = allPost.map((post, index) => {
         const timeStamp = Object.keys(post)[0]
         const postContent = post[timeStamp]
@@ -116,7 +130,7 @@ const Profile = () => {
         return (
             <div className='post' key={index}>
                 <div className='post-content'>
-                    <img className='post-display-img' src={postDisplayImg} alt="postDisplayImg" />
+                    <img className='post-display-img' src={postDisplayImg} alt={timeStamp} onClick={(e) => {handleViewPost(e)}}/>
                 </div>
             </div>
         )
@@ -133,6 +147,16 @@ const Profile = () => {
                         <p className='user-bio'>This is the user's bio</p>
                     </div>
                 </div>
+                {
+                    viewPost ? 
+                        <div className='user-full-post-container'>
+                            <div className='user-full-post-exit' onClick={() => handleExitViewPost()}></div>
+                            <div className='user-full-post'>
+                                {fullPost}
+                            </div>
+                        </div> :
+                        null
+                }
             </div>
             <div className='profile-user-post'>
                 {posts}
