@@ -68,7 +68,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                background: rgba(0,0,0,0.8);
+                background: rgba(0,0,0,0.9);
 
                 .user-full-post-exit {
                     position: absolute;
@@ -80,10 +80,65 @@
                 }
 
                 .user-full-post {
-                    height: 60%;
-                    width: 935px;
+                    min-height: 45vh;
+                    height: fit-content;
+                    width: fit-content;
+                    max-width: 100%;
                     background: white;
                     z-index: 10;
+                    display: flex;
+                    flex-direction: row;
+
+                    .post-img-container {
+                        height: fit-content;
+                        width: fit-content;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: relative;
+                        justify-self: center;
+                        align-self: center;
+
+                        .img-only {
+                            height: fit-content;
+                            width: fit-content;
+
+                            .post-img {
+                                display: none;
+                                user-select: none;
+                                max-height: 60vh;
+                                max-width: 735px;
+
+                                &.show {
+                                    display: block;
+                                }
+                            }
+                        }
+
+                        .change-img {
+                            position: absolute;
+                            cursor: pointer;
+                            fill: white;
+
+                            &.hide {
+                                display: none;
+                            }
+
+                            &.next {
+                                right: 10px;
+                            }
+
+                            &.back {
+                                left: 10px;
+                            }
+                        }
+                    }
+
+                    .post-caption {
+                        width: 400px;
+                        height: 100%;
+                        user-select: none;
+                    }
                 }
             }
         }
@@ -124,6 +179,7 @@
                         height: 100%;
                         width: 100%;
                         user-select: none;
+                        -webkit-user-select: none;
                         cursor: pointer;
                     }
                 }

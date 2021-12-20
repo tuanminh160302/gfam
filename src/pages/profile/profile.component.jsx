@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useRef } from 'react';
 import './profile.styles.scss';
 import { uploadUserAvatar } from '../../firebase/firebase.init';
 
@@ -6,6 +6,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { fetchUserPost } from '../../firebase/firebase.init';
 import { useLocation } from 'react-router-dom';
+
+import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
+import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
 
 import UserAvt from '../../components/user-avt/user-avt.component';
 import PostPreview from '../../components/post-preview/post-preview.component';
@@ -27,8 +30,14 @@ const Profile = () => {
     const [editProfileRights, seteditProfileRights] = useState()
     const [toggleEditProfile, setToggleEditProfile] = useState(false)
     const [userToBeDisplayed, setUserToBeDisplayed] = useState()
+    const [uidToBeDisplayed, setUidToBeDisplayed] = useState()
     const [allPost, setAllPost] = useState([])
-    const [viewPost, setViewPost] = useState(null)
+    const [viewPost, setViewPost] = useState(false)
+    const [postImages, setPostImages] = useState(null)
+    const [postCaption, setPostCaption] = useState(null)
+    const imagesRef = useRef()
+    const [showNext, setShowNext] = useState(true)
+    const [showBack, setShowBack] = useState(false)
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -51,10 +60,10 @@ const Profile = () => {
                 querySnapshot.forEach((snapshot) => {
                     // Process data to be displayed
                     const data = snapshot.data()
-                    
+
                     if (data.postCount) {
                         console.log('data.postCount =>', data.postCount)
-                        
+
                     } else {
                         console.log('this user has no post')
                     }
@@ -65,15 +74,16 @@ const Profile = () => {
                         const allPost = []
                         for (let key in data) {
                             if (key !== 'exist') {
-                                const post = {[key]: data[key]}
+                                const post = { [key]: data[key] }
                                 allPost.push(post)
                             }
                         }
-                        allPost.sort((a,b) => (Object.keys(a) > Object.keys(b) ? -1 : 1))
+                        allPost.sort((a, b) => (Object.keys(a) > Object.keys(b) ? -1 : 1))
                         setAllPost(allPost)
                     })
 
                     setUserToBeDisplayed(data.userName)
+                    setUidToBeDisplayed(data.uid)
                 })
             } else if (querySnapshot.size === 0) {
                 // user not found
@@ -103,18 +113,66 @@ const Profile = () => {
         }
     }
 
+    const handleExitViewPost = () => {
+        setViewPost(false)
+        setShowNext(true)
+        setShowBack(false)
+        setPostImages(null)
+        setPostCaption(null)
+    }
+
+    const handleNextImg = () => {
+        let images = imagesRef.current.children
+        for (let i = 0; i < images.length; i++) {
+            if (images[i].className.includes('show')) {
+                images[i].classList.remove('show')
+                images[i + 1].classList.add('show')
+                if (i === images.length - 2) {
+                    setShowNext(false)
+                }
+                setShowBack(true)
+                return
+            }
+        }
+    }
+
+    const handlePrevImg = () => {
+        let images = imagesRef.current.children
+        for (let i = 0; i < images.length; i++) {
+            if (images[i].className.includes('show')) {
+                images[i].classList.remove('show')
+                images[i - 1].classList.add('show')
+                if (i - 1 === 0) {
+                    setShowBack(false)
+                }
+                setShowNext(true)
+                return
+            }
+        }
+    }
+
     const handleViewPost = (e) => {
         e.preventDefault()
-        setViewPost(e.target.alt)
+        const viewPostRef = doc(db, 'posts', uidToBeDisplayed)
+        const postToBeDisplayed = e.target.alt
+        setViewPost(true)
+        getDoc(viewPostRef).then((snapshot) => {
+            const data = snapshot.data()
+            const postContent = data[postToBeDisplayed]
+            const postImgs = Object.values(postContent['URLS'])
+            postImgs.sort((a, b) => a[1] > b[1] ? 1 : -1)
+            const caption = Object.values(postContent['caption'])
+            let images = postImgs.map((imgArray, index) => {
+                return (
+                    <img key={index} className={`${index === 0 ? 'show' : null} post-img`} src={imgArray[0]} alt={imgArray[0]} draggable={false}></img>
+                )
+            })
+            return [images, caption]
+        }).then(([images, caption]) => {
+            setPostImages(images)
+            setPostCaption(caption)
+        })
     }
-
-    const handleExitViewPost = () => {
-        setViewPost(null)
-    }
-
-    const fullPost = (
-        <div>{viewPost}</div>
-    )
 
     const posts = allPost.map((post, index) => {
         const timeStamp = Object.keys(post)[0]
@@ -126,11 +184,10 @@ const Profile = () => {
                 postDisplayImg = imgArray[0]
             }
         })
-        console.log(Object.values(postContent['URLS']))
         return (
             <div className='post' key={index}>
                 <div className='post-content'>
-                    <img className='post-display-img' src={postDisplayImg} alt={timeStamp} onClick={(e) => {handleViewPost(e)}}/>
+                    <img className='post-display-img' src={postDisplayImg} alt={timeStamp} draggable={false} onClick={(e) => { handleViewPost(e) }} />
                 </div>
             </div>
         )
@@ -148,11 +205,20 @@ const Profile = () => {
                     </div>
                 </div>
                 {
-                    viewPost ? 
+                    viewPost ?
                         <div className='user-full-post-container'>
                             <div className='user-full-post-exit' onClick={() => handleExitViewPost()}></div>
                             <div className='user-full-post'>
-                                {fullPost}
+                                <div className='post-img-container'>
+                                    <div className='img-only' ref={imagesRef}>
+                                        {postImages}
+                                    </div>
+                                    <NextBtn className={`${!showNext && 'hide'} change-img next`} onClick={() => { handleNextImg() }} />
+                                    <BackBtn className={`${!showBack && 'hide'} change-img back`} onClick={() => { handlePrevImg() }} />
+                                </div>
+                                <div className='post-caption'>
+                                    {postCaption}
+                                </div>
                             </div>
                         </div> :
                         null
