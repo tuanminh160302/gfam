@@ -9,8 +9,9 @@ import { useLocation } from 'react-router-dom';
 
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
-
 import UserAvt from '../../components/user-avt/user-avt.component';
+import { uploadUserComment } from '../../firebase/firebase.init';
+
 import PostPreview from '../../components/post-preview/post-preview.component';
 
 const Profile = () => {
@@ -31,6 +32,7 @@ const Profile = () => {
     const [toggleEditProfile, setToggleEditProfile] = useState(false)
     const [userToBeDisplayed, setUserToBeDisplayed] = useState()
     const [uidToBeDisplayed, setUidToBeDisplayed] = useState()
+    const [postToBeViewed, setPostToBeViewed] = useState()
     const [allPost, setAllPost] = useState([])
     const [viewPost, setViewPost] = useState(false)
     const [postImages, setPostImages] = useState(null)
@@ -38,6 +40,9 @@ const Profile = () => {
     const imagesRef = useRef()
     const [showNext, setShowNext] = useState(true)
     const [showBack, setShowBack] = useState(false)
+    const [postComment, setPostComment] = useState(null)
+    const [allComment, setAllComment] = useState([])
+    const textAreaRef = useRef()
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -119,7 +124,62 @@ const Profile = () => {
         setShowBack(false)
         setPostImages(null)
         setPostCaption(null)
+        setPostComment(null)
+        setPostToBeViewed(null)
+        setAllComment([])
     }
+
+    const fetchPostComment = (postToBeFetched) => {
+        const postRef = doc(db, 'posts', uidToBeDisplayed)
+        getDoc(postRef).then(async (snapshot) => {
+            const data = snapshot.data()
+            const allCommentObject = data[postToBeFetched].comment
+            if (allCommentObject) {
+                const allCommentArray = Object.keys(allCommentObject)
+                allCommentArray.sort((a,b) => (a > b ? 1 : -1))
+                const resolveAllComment = allCommentArray.map( async (timestamp, index) => {
+                    const commentContent = allCommentObject[timestamp][0]
+                    let userAvt = null
+                    let userName = null
+                    // console.log(commentContent)
+                    const commentByUid = allCommentObject[timestamp][1]
+                    const userRef = doc(db, 'users', commentByUid)
+                    await getDoc(userRef).then((snapshot) => {
+                        userAvt = snapshot.data().avatarURL
+                        userName = snapshot.data().userName
+                        console.log(commentContent)
+                    })
+                    return [userAvt, commentContent, userName]
+                })
+    
+                console.log(resolveAllComment)
+    
+                await Promise.all(resolveAllComment).then((responses) => {
+                    setAllComment(responses)
+                })
+            }
+        })
+    }
+
+    useEffect(() => {
+        console.log(allComment)
+    }, [allComment])
+
+    // const comments = null
+
+    const comments = allComment.map(([userAvt, commentContent, userName], index) => {
+        return (
+            <div key={index} className='comment-container'>
+                <div className='comment-user-avt-container'>
+                    <UserAvt className='comment-user-avt' self={false} src={userAvt}/>
+                </div>
+                <p className='comment-content'>
+                    <span className='comment-by'>{userName}</span>
+                    {commentContent}
+                </p>
+            </div>
+        )
+    })
 
     const handleNextImg = () => {
         let images = imagesRef.current.children
@@ -159,6 +219,7 @@ const Profile = () => {
         getDoc(viewPostRef).then((snapshot) => {
             const data = snapshot.data()
             const postContent = data[postToBeDisplayed]
+            setPostToBeViewed(e.target.alt)
             const postImgs = Object.values(postContent['URLS'])
             postImgs.sort((a, b) => a[1] > b[1] ? 1 : -1)
             const caption = Object.values(postContent['caption'])
@@ -171,6 +232,7 @@ const Profile = () => {
         }).then(([images, caption]) => {
             setPostImages(images)
             setPostCaption(caption)
+            fetchPostComment(postToBeDisplayed)
         })
     }
 
@@ -192,6 +254,20 @@ const Profile = () => {
             </div>
         )
     })
+
+    const handlePostCommentChange = (e) => {
+        e.preventDefault()
+        setPostComment(e.target.value)
+    }
+
+    const handlePostCommentSubmit = () => {
+        textAreaRef.current.value = ''
+        const uidFrom = user.uid
+        const commentTimeStamp = new Date().getTime()
+        uploadUserComment(uidFrom, uidToBeDisplayed, postToBeViewed, [commentTimeStamp, postComment]).then(() => {
+            fetchPostComment(postToBeViewed)
+        })
+    }
 
     const userContent = (
         <>
@@ -217,7 +293,18 @@ const Profile = () => {
                                     <BackBtn className={`${!showBack && 'hide'} change-img back`} onClick={() => { handlePrevImg() }} />
                                 </div>
                                 <div className='post-caption'>
-                                    {postCaption}
+                                    <div className='post-info-container'>
+                                        <UserAvt className='post-avt' self={false} src={profileUserAvt} />
+                                        <p className='post-username'>{userToBeDisplayed}</p>
+                                    </div>
+                                    <div className='post-comment-container'>
+                                        {comments}
+                                    </div>
+                                    <div className='post-add-comment-container'>
+                                        <textarea className='post-add-comment-input' placeholder='Add comment...' name="add-comment" ref={textAreaRef} onChange={(e) => {handlePostCommentChange(e)}}></textarea>
+                                        <p className='post-add-comment-submit' onClick={() => {handlePostCommentSubmit()}}>Add</p>
+                                    </div>
+                                    {/* {postCaption} */}
                                 </div>
                             </div>
                         </div> :

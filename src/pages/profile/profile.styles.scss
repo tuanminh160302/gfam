@@ -81,7 +81,7 @@
 
                 .user-full-post {
                     min-height: 45vh;
-                    height: fit-content;
+                    height: 65vh;
                     width: fit-content;
                     max-width: 100%;
                     background: white;
@@ -90,8 +90,9 @@
                     flex-direction: row;
 
                     .post-img-container {
-                        height: fit-content;
+                        height: 100%;
                         width: fit-content;
+                        max-width: 100%;
                         display: flex;
                         justify-content: center;
                         align-items: center;
@@ -100,14 +101,15 @@
                         align-self: center;
 
                         .img-only {
-                            height: fit-content;
+                            height: 100%;
+                            max-width: 100%;
                             width: fit-content;
 
                             .post-img {
                                 display: none;
                                 user-select: none;
-                                max-height: 60vh;
-                                max-width: 735px;
+                                height: 100%;
+                                width: auto;
 
                                 &.show {
                                     display: block;
@@ -135,9 +137,119 @@
                     }
 
                     .post-caption {
-                        width: 400px;
+                        width: 350px;
                         height: 100%;
                         user-select: none;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        padding-bottom: 10px;
+
+                        .post-info-container {
+                            width: 100%;
+                            height: fit-content;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            padding: 20px 0 15px 20px;
+                            border-bottom: 1px solid $border-gray;
+
+                            .post-avt {
+                                height: 3.5vh;
+                                width: 3.5vh;
+                                border-radius: 50%;
+                                cursor: pointer;
+                            }
+
+                            .post-username {
+                                margin-left: 15px;
+                                font-weight: 600;
+                            }
+                        }
+
+                        .post-comment-container {
+                            flex-grow: 1;
+                            width: 100%;
+                            padding: 20px 20px 10px 20px;
+
+                            .comment-container {
+                                width: 100%;
+                                height: fit-content;
+                                display: flex;
+                                flex-direction: row;
+                                align-items: flex-start;
+                                margin-bottom: 10px;
+                                // word-break: break-all;
+
+                                .comment-user-avt-container {
+                                    height: 3.5vh;
+                                    width: 3.5vh;
+                                    min-height: 3.5vh;
+                                    min-width: 3.5vh;
+                                    border-radius: 50%;
+
+                                    .comment-user-avt {
+                                        object-fit: cover;
+                                        height: 100%;
+                                        width: 100%;
+                                        border-radius: 50%;
+                                    }
+                                }
+
+                                .comment-content {
+                                    margin-left: 15px;
+                                    font-size: .9rem;
+                                    word-break: break-all;
+
+                                    .comment-by {
+                                        font-weight: 600;
+                                        margin-right: 10px;
+                                    }
+                                }
+                            }
+                        }
+
+                        .post-add-comment-container {
+                            height: 6vh;
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            border-top: 1px solid $border-gray;
+
+                            .post-add-comment-input {
+                                height: 100%;
+                                box-sizing: border-box;
+                                font-size: 1rem;
+                                text-align: left;
+                                overflow: auto;
+                                resize: none;
+                                border: none;
+                                background: white;
+                                display: block;
+                                padding: 10px 0 0px 15px;
+                                font-size: .9rem;
+                                flex-grow: 1;
+        
+                                &:focus {
+                                    outline: none;
+                                }
+        
+                                &::placeholder {
+                                    color: $text-gray;
+                                    font-size: .9rem;
+                                }
+                            }
+
+                            .post-add-comment-submit {
+                                margin-right: 20px;
+                                margin-left: 10px;
+                                font-weight: 600;
+                                color: $text-blue;
+                                font-size: .9rem;
+                                cursor: pointer;
+                            }
+                        }
                     }
                 }
             }

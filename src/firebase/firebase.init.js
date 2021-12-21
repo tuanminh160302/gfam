@@ -184,5 +184,26 @@ export const fetchUserPost = async (uid) => {
   return data
 }
 
+export const uploadUserComment = async (uidFrom, uidTo, post, [commentTimestamp, comment]) => {
+  if (!uidFrom || !uidTo) {
+    return
+  }
+
+  const postRef = doc(db, 'posts', uidTo)
+  try {
+    await setDoc(postRef, 
+      {
+        [post]: {
+          comment: {
+            [commentTimestamp]: [comment, uidFrom]
+          }
+        }
+      }, {merge: true})
+      console.log('Comment added')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 export default firebaseApp;
 
