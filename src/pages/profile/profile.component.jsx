@@ -147,12 +147,9 @@ const Profile = () => {
                     await getDoc(userRef).then((snapshot) => {
                         userAvt = snapshot.data().avatarURL
                         userName = snapshot.data().userName
-                        console.log(commentContent)
                     })
                     return [userAvt, commentContent, userName]
                 })
-    
-                console.log(resolveAllComment)
     
                 await Promise.all(resolveAllComment).then((responses) => {
                     setAllComment(responses)
@@ -160,10 +157,6 @@ const Profile = () => {
             }
         })
     }
-
-    useEffect(() => {
-        console.log(allComment)
-    }, [allComment])
 
     // const comments = null
 
