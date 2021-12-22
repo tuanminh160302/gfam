@@ -136,8 +136,8 @@ const Profile = () => {
             const allCommentObject = data[postToBeFetched].comment
             if (allCommentObject) {
                 const allCommentArray = Object.keys(allCommentObject)
-                allCommentArray.sort((a,b) => (a > b ? 1 : -1))
-                const resolveAllComment = allCommentArray.map( async (timestamp, index) => {
+                allCommentArray.sort((a, b) => (a > b ? 1 : -1))
+                const resolveAllComment = allCommentArray.map(async (timestamp, index) => {
                     const commentContent = allCommentObject[timestamp][0]
                     let userAvt = null
                     let userName = null
@@ -148,9 +148,9 @@ const Profile = () => {
                         userAvt = snapshot.data().avatarURL
                         userName = snapshot.data().userName
                     })
-                    return [userAvt, commentContent, userName]
+                    return [userAvt, commentContent, userName, timestamp]
                 })
-    
+
                 await Promise.all(resolveAllComment).then((responses) => {
                     setAllComment(responses)
                 })
@@ -160,17 +160,32 @@ const Profile = () => {
 
     // const comments = null
 
-    const comments = allComment.map(([userAvt, commentContent, userName], index) => {
+    const comments = allComment.map(([userAvt, commentContent, userName, timestamp], index) => {
+        const time = new Date(parseInt(timestamp))
+        const timeNow = new Date()
+        let timeSpan = null
+        if (Math.floor((timeNow - time) / 86400000) === 0) {
+            timeSpan = String(Math.floor((timeNow - time) / 3600000)) + "h"
+        } else if (Math.floor((timeNow - time) / 86400000) !== 0) {
+            timeSpan = String(Math.floor((timeNow - time) / 86400000)) + "d"
+        }
+
+
         return (
-            <div key={index} className='comment-container'>
-                <div className='comment-user-avt-container'>
-                    <UserAvt className='comment-user-avt' self={false} src={userAvt}/>
+            <Fragment key={index}>
+                <div className='comment-container'>
+                    <div className='comment-user-avt-container'>
+                        <UserAvt className='comment-user-avt' self={false} src={userAvt} />
+                    </div>
+                    <p className='comment-content'>
+                        <span className='comment-by'>{userName}</span>
+                        {commentContent}
+                    </p>
                 </div>
-                <p className='comment-content'>
-                    <span className='comment-by'>{userName}</span>
-                    {commentContent}
+                <p className='comment-timespan'>
+                    {timeSpan}
                 </p>
-            </div>
+            </Fragment>
         )
     })
 
@@ -294,8 +309,8 @@ const Profile = () => {
                                         {comments}
                                     </div>
                                     <div className='post-add-comment-container'>
-                                        <textarea className='post-add-comment-input' placeholder='Add comment...' name="add-comment" ref={textAreaRef} onChange={(e) => {handlePostCommentChange(e)}}></textarea>
-                                        <p className='post-add-comment-submit' onClick={() => {handlePostCommentSubmit()}}>Add</p>
+                                        <textarea className='post-add-comment-input' placeholder='Add comment...' name="add-comment" ref={textAreaRef} onChange={(e) => { handlePostCommentChange(e) }}></textarea>
+                                        <p className='post-add-comment-submit' onClick={() => { handlePostCommentSubmit() }}>Add</p>
                                     </div>
                                     {/* {postCaption} */}
                                 </div>
