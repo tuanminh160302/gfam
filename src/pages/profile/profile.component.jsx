@@ -5,7 +5,7 @@ import { uploadUserAvatar } from '../../firebase/firebase.init';
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { fetchUserPost } from '../../firebase/firebase.init';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
@@ -23,6 +23,7 @@ const Profile = () => {
     const auth = getAuth();
     const db = getFirestore();
     const location = useLocation();
+    const navigate = useNavigate();
     const pathname = location.pathname
     const user = auth.currentUser
 
@@ -158,7 +159,12 @@ const Profile = () => {
         })
     }
 
-    // const comments = null
+    const handleRedirectUser = (e) => {
+        const targetUserTag = e.target
+        const userName = targetUserTag.innerHTML
+        navigate(`/${userName}`)
+        handleExitViewPost()
+    }
 
     const comments = allComment.map(([userAvt, commentContent, userName, timestamp], index) => {
         const time = new Date(parseInt(timestamp))
@@ -178,7 +184,7 @@ const Profile = () => {
                         <UserAvt className='comment-user-avt' self={false} src={userAvt} />
                     </div>
                     <p className='comment-content'>
-                        <span className='comment-by'>{userName}</span>
+                        <span className='comment-by' onClick={(e) => {handleRedirectUser(e)}}>{userName}</span>
                         {commentContent}
                     </p>
                 </div>
