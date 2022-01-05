@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { fetchUserPost } from '../../firebase/firebase.init';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
@@ -14,7 +15,7 @@ import { uploadUserComment } from '../../firebase/firebase.init';
 
 import PostPreview from '../../components/post-preview/post-preview.component';
 
-const Profile = () => {
+const Profile = ({ isSignedIn }) => {
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -184,7 +185,7 @@ const Profile = () => {
                         <UserAvt className='comment-user-avt' self={false} src={userAvt} />
                     </div>
                     <p className='comment-content'>
-                        <span className='comment-by' onClick={(e) => {handleRedirectUser(e)}}>{userName}</span>
+                        <span className='comment-by' onClick={(e) => { handleRedirectUser(e) }}>{userName}</span>
                         {commentContent}
                     </p>
                 </div>
@@ -332,8 +333,10 @@ const Profile = () => {
     )
 
     return (
-        <div className="user-profile">
-            {/* {editProfileRights ?
+        <>
+            {!isSignedIn ? <p className='sign-out-action' onClick={() => {navigate("/")}}>Sign in to view this user's profile</p> : null}
+            <div className={`${!isSignedIn ? 'sign-out-alert' : null} user-profile`}>
+                {/* {editProfileRights ?
                 <form onSubmit={(e) => { handleSubmitFile(e) }}>
                     <input type="file" onChange={(e) => { handleFileChange(e) }} />
                     <button type='submit'>Upload</button>
@@ -341,16 +344,20 @@ const Profile = () => {
             : null}
             <p>This page is of user</p>
             <p>{userToBeDisplayed}</p> */}
-
-            <div className='profile-container'>
-                {
-                    !userToBeDisplayed ?
-                        <p>Loading...</p> :
-                        userContent
-                }
+                <div className='profile-container'>
+                    {
+                        !userToBeDisplayed ?
+                            <p>Loading...</p> :
+                            userContent
+                    }
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
-export default Profile;
+const mapDispatchToProps = ({ isSignedIn }) => ({
+    isSignedIn: isSignedIn.isSignedIn
+})
+
+export default connect(mapDispatchToProps, null)(Profile);

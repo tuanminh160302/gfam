@@ -1,5 +1,20 @@
 @import '../../assets/uik.styles.scss';
 
+.sign-out-action {
+    color: $text-blue;
+    font-weight: 600;
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10000;
+    background: white;
+    padding: 20px 50px;
+    border-radius: 50px;
+}
+
 .user-profile {
     height: fit-content;
     width: 100%;
@@ -7,6 +22,12 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+
+    &.sign-out-alert {
+        filter: blur(18px);
+        user-select: none;
+        pointer-events: none;
+    }
 
     .profile-container {
         height: fit-content;
