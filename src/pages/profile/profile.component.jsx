@@ -45,6 +45,7 @@ const Profile = ({ isSignedIn }) => {
     const [postComment, setPostComment] = useState(null)
     const [allComment, setAllComment] = useState([])
     const textAreaRef = useRef()
+    const [isFollowing, setIsFollowing] = useState()
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -284,12 +285,19 @@ const Profile = ({ isSignedIn }) => {
         })
     }
 
+    const handleFollowAction = () => {
+        isFollowing ? setIsFollowing(false) : setIsFollowing(true)
+    }
+
     const userContent = (
         <>
             <div className='profile-user-info'>
                 <UserAvt className='profile-user-avt' self={false} src={profileUserAvt} />
                 <div className='profile-user-details'>
-                    <p className='username'>{userToBeDisplayed}</p>
+                    <div className='name-follow'>
+                        <p className='username'>{userToBeDisplayed}</p>
+                        <button className='follow' onClick={() => {handleFollowAction()}}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
+                    </div>
                     <div className='user-description'>
                         <p className='display-name'>{displayName}</p>
                         <p className='user-bio'>This is the user's bio</p>

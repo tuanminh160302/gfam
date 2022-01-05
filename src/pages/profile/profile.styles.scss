@@ -62,19 +62,42 @@
                 align-items: flex-start;
                 justify-content: space-around;
 
-                .username {
-                    font-size: 1.5rem;
-                    font-weight: 500;
+                .name-follow {
+                    width: fit-content;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+
+                    .username {
+                        font-size: 1.5rem;
+                        font-weight: 300;
+                    }
+
+                    .follow {
+                        color: white;
+                        padding: 7px 14px;
+                        background: $text-blue;
+                        height: fit-content;
+                        width: fit-content;
+                        font-size: .95rem;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        margin-left: 50px;
+                    }
                 }
 
                 .user-description {
+
                     .display-name {
                         font-weight: 600;
                         margin-bottom: 7px;
+                        font-size: .8rem;
                     }
-                    
-                    .user-bio {
 
+                    .user-bio {
+                        font-size: .7rem;
                     }
                 }
             }

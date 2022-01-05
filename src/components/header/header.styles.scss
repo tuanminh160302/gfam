@@ -7,10 +7,10 @@
     align-items: center;
     position: sticky;
     top: 0;
-    height: 6vh;
+    height: 5vh;
     max-width: 100vw;
     background-color: white;
-    border-bottom: 2px solid $border-gray;
+    border-bottom: .1px solid $border-gray;
     z-index: 1000;
 
     .container {
@@ -40,8 +40,8 @@
             }
     
             .user-avt {
-                height: 3vh;
-                width: 3vh;
+                height: 2.8vh;
+                width: 2.8vh;
                 border-radius: 50%;
                 cursor: pointer;
                 padding: 2px;
@@ -50,8 +50,8 @@
 
             .icon {
                 fill: $main;
-                height: 2.5vh;
-                width: 2.5vh;
+                height: 2.3vh;
+                width: 2.3vh;
                 margin-right: 20px;
                 cursor: pointer;
             }
