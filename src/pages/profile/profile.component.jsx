@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { ReactComponent as NextBtn } from '../../assets/media/next.svg';
 import { ReactComponent as BackBtn } from '../../assets/media/back.svg';
 import UserAvt from '../../components/user-avt/user-avt.component';
-import { uploadUserComment } from '../../firebase/firebase.init';
+import { uploadUserComment, followAction } from '../../firebase/firebase.init';
 
 import PostPreview from '../../components/post-preview/post-preview.component';
 
@@ -34,6 +34,7 @@ const Profile = ({ isSignedIn }) => {
     const [toggleEditProfile, setToggleEditProfile] = useState(false)
     const [userToBeDisplayed, setUserToBeDisplayed] = useState()
     const [uidToBeDisplayed, setUidToBeDisplayed] = useState()
+    const [selfUid, setSelfUid] = useState()
     const [postToBeViewed, setPostToBeViewed] = useState()
     const [allPost, setAllPost] = useState([])
     const [viewPost, setViewPost] = useState(false)
@@ -46,15 +47,19 @@ const Profile = ({ isSignedIn }) => {
     const [allComment, setAllComment] = useState([])
     const textAreaRef = useRef()
     const [isFollowing, setIsFollowing] = useState()
+    const [followingList, setFollowingList] = useState()
+    const [followerList, setFollowerList] = useState()
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const { uid } = user
+                setSelfUid(uid)
                 const userRef = doc(db, 'users', uid)
                 getDoc(userRef).then((snapshot) => {
                     if (pathname.slice(1) === snapshot.data().userName) {
                         seteditProfileRights(true)
+                        setToggleEditProfile(true)
                     }
                 })
             }
@@ -68,6 +73,33 @@ const Profile = ({ isSignedIn }) => {
                 querySnapshot.forEach((snapshot) => {
                     // Process data to be displayed
                     const data = snapshot.data()
+
+                    if (data.socialStatus) {
+                        if (data.socialStatus.follower) {
+                            const LOCAL_FollowList = Object.keys(data.socialStatus.follower) 
+                    
+                            if (selfUid) {
+                                if (LOCAL_FollowList.includes(selfUid)) {
+                                    setIsFollowing(true)
+                                } else {
+                                    setIsFollowing(false)
+                                }
+                            } 
+                        }
+                    }
+                    
+
+                    if (data.socialStatus) {
+                        if (data.socialStatus.follower) {
+                            setFollowerList(Object.keys(data.socialStatus.follower))
+                        }
+
+                        if (data.socialStatus.following) {
+                            setFollowingList(Object.keys(data.socialStatus.following))
+                        }
+
+                        console.log('followerList =>', followerList)
+                    }                 
 
                     if (data.postCount) {
                         console.log('data.postCount =>', data.postCount)
@@ -102,7 +134,7 @@ const Profile = ({ isSignedIn }) => {
                 console.log('at least 2 user has same username')
             }
         })
-    }, [pathname, auth, db])
+    }, [pathname, auth, db, selfUid])
 
     let file = null
 
@@ -239,11 +271,15 @@ const Profile = ({ isSignedIn }) => {
             const postImgs = Object.values(postContent['URLS'])
             postImgs.sort((a, b) => a[1] > b[1] ? 1 : -1)
             const caption = Object.values(postContent['caption'])
+            if (postImgs.length === 1) {
+                setShowNext(false)
+                setShowBack(false)
+            }
             let images = postImgs.map((imgArray, index) => {
                 return (
                     <img key={index} className={`${index === 0 ? 'show' : null} post-img`} src={imgArray[0]} alt={imgArray[0]} draggable={false}></img>
-                )
-            })
+                    )
+                })
             return [images, caption]
         }).then(([images, caption]) => {
             setPostImages(images)
@@ -286,7 +322,9 @@ const Profile = ({ isSignedIn }) => {
     }
 
     const handleFollowAction = () => {
+        if (toggleEditProfile) return
         isFollowing ? setIsFollowing(false) : setIsFollowing(true)
+        followAction(selfUid, uidToBeDisplayed, isFollowing)        
     }
 
     const userContent = (
@@ -296,7 +334,7 @@ const Profile = ({ isSignedIn }) => {
                 <div className='profile-user-details'>
                     <div className='name-follow'>
                         <p className='username'>{userToBeDisplayed}</p>
-                        <button className='follow' onClick={() => {handleFollowAction()}}>{isFollowing ? 'Unfollow' : 'Follow'}</button>
+                        <button className='follow' onClick={() => {handleFollowAction()}}>{toggleEditProfile ? 'Edit Profile' : isFollowing ? 'Unfollow' : 'Follow'}</button>
                     </div>
                     <div className='user-description'>
                         <p className='display-name'>{displayName}</p>

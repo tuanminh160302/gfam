@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
-import { doc, getDoc, setDoc, collection, getDocs, where, query } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, where, query, deleteField } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { getAuth, updateProfile } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -200,6 +200,73 @@ export const uploadUserComment = async (uidFrom, uidTo, post, [commentTimestamp,
         }
       }, {merge: true})
       console.log('Comment added')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const followAction = async (uidFrom, uidTo, isFollow) => {
+  if (!uidFrom || !uidTo) {
+    return
+  }
+
+  const createdAt = new Date().getTime()
+
+  const userFromRef = doc(db, 'users', uidFrom)
+  const userToRef = doc(db, 'users', uidTo)
+  
+  let fromUser = null
+  let toUser = null
+
+  await getDoc(userFromRef).then((snapshot) => {
+    fromUser = snapshot.data().userName
+  })
+
+  await getDoc(userToRef).then((snapshot) => {
+    toUser = snapshot.data().userName
+  })
+
+  try {
+    if (!isFollow) {
+      await setDoc(userFromRef, 
+        {
+          socialStatus: {
+            following: {
+              [uidTo]: [toUser, createdAt]
+            },
+          }
+        }, {merge: true})
+
+      await setDoc(userToRef, 
+        {
+          socialStatus: {
+            follower: {
+              [uidFrom]: [fromUser, createdAt]
+            }
+          }
+        }, {merge: true})
+
+      console.log('follow action pushed')
+    } else if(isFollow) {
+      await setDoc(userFromRef, 
+        {
+          socialStatus: {
+            following: {
+              [uidTo]: deleteField()
+            }
+          }
+        }, {merge: true})
+
+      await setDoc(userToRef, 
+        {
+          socialStatus: {
+            follower: {
+              [uidFrom]: deleteField() 
+            }
+          }
+        }, {merge: true})
+      console.log('unfollow action pushed')
+    }
   } catch (err) {
     console.log(err)
   }
