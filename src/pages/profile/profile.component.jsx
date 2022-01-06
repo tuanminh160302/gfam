@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import './profile.styles.scss';
 import { uploadUserAvatar } from '../../firebase/firebase.init';
 
@@ -47,8 +48,15 @@ const Profile = ({ isSignedIn }) => {
     const [allComment, setAllComment] = useState([])
     const textAreaRef = useRef()
     const [isFollowing, setIsFollowing] = useState()
-    const [followingList, setFollowingList] = useState()
-    const [followerList, setFollowerList] = useState()
+    const [followingList, setFollowingList] = useState([])
+    const [followerList, setFollowerList] = useState([])
+    const [postNum, setPostNum] = useState()
+    const [viewSocialStatus, setViewSocialStatus] = useState(false)
+    const [viewSocialStatusAction, setViewSocialStatusAction] = useState()
+
+    useEffect(() => {
+        console.log('viewSocialStatus =>', viewSocialStatus)
+    }, [viewSocialStatus])
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -60,6 +68,8 @@ const Profile = ({ isSignedIn }) => {
                     if (pathname.slice(1) === snapshot.data().userName) {
                         seteditProfileRights(true)
                         setToggleEditProfile(true)
+                    } else {
+                        setToggleEditProfile(false)
                     }
                 })
             }
@@ -76,36 +86,37 @@ const Profile = ({ isSignedIn }) => {
 
                     if (data.socialStatus) {
                         if (data.socialStatus.follower) {
-                            const LOCAL_FollowList = Object.keys(data.socialStatus.follower) 
-                    
+                            const LOCAL_FollowList = Object.keys(data.socialStatus.follower)
+
                             if (selfUid) {
                                 if (LOCAL_FollowList.includes(selfUid)) {
                                     setIsFollowing(true)
                                 } else {
                                     setIsFollowing(false)
                                 }
-                            } 
+                            }
                         }
                     }
-                    
+
 
                     if (data.socialStatus) {
                         if (data.socialStatus.follower) {
-                            setFollowerList(Object.keys(data.socialStatus.follower))
+                            setFollowerList(data.socialStatus.follower)
                         }
 
                         if (data.socialStatus.following) {
-                            setFollowingList(Object.keys(data.socialStatus.following))
+                            setFollowingList(data.socialStatus.following)
                         }
 
                         console.log('followerList =>', followerList)
-                    }                 
+                    }
 
                     if (data.postCount) {
                         console.log('data.postCount =>', data.postCount)
-
+                        setPostNum(data.postCount)
                     } else {
                         console.log('this user has no post')
+                        setPostNum(0)
                     }
 
                     setDisplayName(data.displayName)
@@ -151,17 +162,6 @@ const Profile = ({ isSignedIn }) => {
         if (user) {
             uploadUserAvatar(user, file)
         }
-    }
-
-    const handleExitViewPost = () => {
-        setViewPost(false)
-        setShowNext(true)
-        setShowBack(false)
-        setPostImages(null)
-        setPostCaption(null)
-        setPostComment(null)
-        setPostToBeViewed(null)
-        setAllComment([])
     }
 
     const fetchPostComment = (postToBeFetched) => {
@@ -278,14 +278,25 @@ const Profile = ({ isSignedIn }) => {
             let images = postImgs.map((imgArray, index) => {
                 return (
                     <img key={index} className={`${index === 0 ? 'show' : null} post-img`} src={imgArray[0]} alt={imgArray[0]} draggable={false}></img>
-                    )
-                })
+                )
+            })
             return [images, caption]
         }).then(([images, caption]) => {
             setPostImages(images)
             setPostCaption(caption)
             fetchPostComment(postToBeDisplayed)
         })
+    }
+
+    const handleExitViewPost = () => {
+        setViewPost(false)
+        setShowNext(true)
+        setShowBack(false)
+        setPostImages(null)
+        setPostCaption(null)
+        setPostComment(null)
+        setPostToBeViewed(null)
+        setAllComment([])
     }
 
     const posts = allPost.map((post, index) => {
@@ -324,8 +335,49 @@ const Profile = ({ isSignedIn }) => {
     const handleFollowAction = () => {
         if (toggleEditProfile) return
         isFollowing ? setIsFollowing(false) : setIsFollowing(true)
-        followAction(selfUid, uidToBeDisplayed, isFollowing)        
+        followAction(selfUid, uidToBeDisplayed, isFollowing)
     }
+
+    const handleViewSocialStatus = (e) => {
+        setViewSocialStatus(true)
+
+        const action = e.target.innerText.split(' ')[1]
+        if (action === 'Follower') {
+            setViewSocialStatusAction('Follower')
+            console.log(followerList)
+        } else if (action === 'Following') {
+            setViewSocialStatusAction('Following')
+            console.log(followingList)
+        }
+    }
+
+    const handleExitViewSocialStatus = () => {
+        setViewSocialStatus(false)
+    }
+
+    const followerDiv = Object.keys(followerList).map((uid) => {
+        return (
+            <div className='user-data' key={uid}>
+                <UserAvt className='user-avt' self={false} src={followerList[uid][2]}/>
+                <div className='user-info'>
+                    <p className='user-name' onClick={() => {navigate(`/${followerList[uid][0]}`); setViewSocialStatus(false)}}>{followerList[uid][0]}</p>
+                    <p className='display-name'>{followerList[uid][1]}</p>
+                </div>
+            </div>
+        )
+    })
+
+    const followingDiv = Object.keys(followingList).map((uid) => {
+        return (
+            <div className='user-data' key={uid}>
+                <UserAvt className='user-avt' self={false} src={followingList[uid][2]}/>
+                <div className='user-info'>
+                    <p className='user-name' onClick={() => {navigate(`/${followingList[uid][0]}`); setViewSocialStatus(false)}}>{followingList[uid][0]} </p>
+                    <p className='display-name'>{followingList[uid][1]}</p>
+                </div>
+            </div>
+        )
+    })
 
     const userContent = (
         <>
@@ -334,7 +386,12 @@ const Profile = ({ isSignedIn }) => {
                 <div className='profile-user-details'>
                     <div className='name-follow'>
                         <p className='username'>{userToBeDisplayed}</p>
-                        <button className='follow' onClick={() => {handleFollowAction()}}>{toggleEditProfile ? 'Edit Profile' : isFollowing ? 'Unfollow' : 'Follow'}</button>
+                        <button className='follow' onClick={() => { handleFollowAction() }}>{toggleEditProfile ? 'Edit Profile' : isFollowing ? 'Unfollow' : 'Follow'}</button>
+                    </div>
+                    <div className='user-stats'>
+                        <p className='stat'>{`${postNum} Posts`}</p>
+                        <p className='stat' onClick={(e) => { handleViewSocialStatus(e) }}>{`${Object.keys(followerList).length} Follower`}</p>
+                        <p className='stat' onClick={(e) => { handleViewSocialStatus(e) }}>{`${Object.keys(followingList).length} Following`}</p>
                     </div>
                     <div className='user-description'>
                         <p className='display-name'>{displayName}</p>
@@ -371,6 +428,19 @@ const Profile = ({ isSignedIn }) => {
                         </div> :
                         null
                 }
+                {
+                    viewSocialStatus ?
+                        <div className='user-social-status-container'>
+                            <div className='user-social-status-exit' onClick={() => { handleExitViewSocialStatus() }}></div>
+                            <div className='user-social-status'>
+                                <div className='social-status-header'>
+                                    <p className='title'>{viewSocialStatusAction}</p>
+                                </div>
+                                <div className='people'>{viewSocialStatusAction === 'Follower' ? followerDiv : followingDiv}</div>
+                            </div>
+                        </div> :
+                        null
+                }
             </div>
             <div className='profile-user-post'>
                 {posts}
@@ -380,7 +450,7 @@ const Profile = ({ isSignedIn }) => {
 
     return (
         <>
-            {!isSignedIn ? <p className='sign-out-action' onClick={() => {navigate("/")}}>Sign in to view this user's profile</p> : null}
+            {!isSignedIn ? <p className='sign-out-action' onClick={() => { navigate("/") }}>Sign in to view this user's profile</p> : null}
             <div className={`${!isSignedIn ? 'sign-out-alert' : null} user-profile`}>
                 {/* {editProfileRights ?
                 <form onSubmit={(e) => { handleSubmitFile(e) }}>

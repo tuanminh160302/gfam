@@ -1,5 +1,27 @@
 @import '../../assets/uik.styles.scss';
 
+@mixin user-data {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+@mixin user-info {
+    .user-name {
+        color: black;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 7px;
+        cursor: pointer;
+    }
+
+    .display-name {
+        font-size: .8rem;
+        color: $text-gray;
+        font-weight: 500;
+    }
+}
+
 .sign-out-action {
     color: $text-blue;
     font-weight: 600;
@@ -39,19 +61,20 @@
 
         .profile-user-info {
             height: fit-content;
-            padding: 20px 70px;
+            padding: 25px 55px;
             width: 100%;
             display: flex;
             flex-direction: row;
 
             .profile-user-avt {
-                height: 17vh;
-                width: 17vh;
+                height: 15vh;
+                width: 15vh;
                 margin-right: 90px;
                 border-radius: 50%;
                 cursor: pointer;
                 padding: 5px;
                 border: 1px solid $border-gray;
+                object-fit: cover;
             }
 
             .profile-user-details {
@@ -60,9 +83,9 @@
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
-                justify-content: space-around;
 
                 .name-follow {
+                    margin-top: 15px;
                     width: fit-content;
                     display: flex;
                     flex-direction: row;
@@ -70,7 +93,7 @@
 
                     .username {
                         font-size: 1.5rem;
-                        font-weight: 300;
+                        font-weight: 400;
                     }
 
                     .follow {
@@ -88,7 +111,28 @@
                     }
                 }
 
+                .user-stats {
+                    margin-top: 20px;
+                    width: fit-content;
+                    height: fit-content;
+                    display: flex;
+                    flex-direction: row;
+                    font-size: .8rem;
+                    font-weight: 600;
+
+                    .stat {
+                        margin-right: 60px;
+                        user-select: none;
+
+                        &:nth-child(2), &:nth-child(3) {
+                            cursor: pointer;
+                        }
+                    }
+                }
+
                 .user-description {
+                    margin-top: 20px;
+                    width: fit-content;
 
                     .display-name {
                         font-weight: 600;
@@ -215,7 +259,7 @@
                             flex-grow: 1;
                             width: 100%;
                             padding: 20px 20px 10px 20px;
-                            overflow-y: scroll;
+                            overflow-y: auto;
 
                             .comment-container {
                                 width: 100%;
@@ -302,6 +346,88 @@
                                 color: $text-blue;
                                 font-size: .9rem;
                                 cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .user-social-status-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 100000;
+                height: 100vh;
+                width: 100vw;
+                background: rgba(0,0,0,0.6);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .user-social-status-exit {
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 1;
+                }
+
+                .user-social-status {
+                    height: 400px;
+                    min-height: 200px;
+                    max-height: 90vh;
+                    width: 400px;
+                    max-width: 90vw;
+                    background: white;
+                    z-index: 10;
+                    border-radius: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+
+                    .social-status-header {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        height: fit-content;
+                        border-top-right-radius: 20px;
+                        border-top-left-radius: 20px;
+                        border-bottom: .5px solid $border-gray;
+                        // flex-grow: 1;
+
+                        .title {
+                            font-size: .8rem;
+                            font-weight: 500;
+                            margin: 10px 0px;
+                        }
+                    }
+
+                    .people {
+                        width: 100%;
+                        flex-grow: 1;
+                        border-bottom-left-radius: 20px;
+                        border-bottom-right-radius: 20px;
+                        border-radius: 20px;
+                        overflow-y: auto;
+                        padding-top: 15px;
+
+                        .user-data {
+                            @include user-data();
+                            margin-bottom: 20px;
+                            
+                            .user-avt {
+                                height: 3vh;
+                                width: 3vh;
+                                border-radius: 50%;
+                                margin-left: 20px;
+                                margin-right: 15px;
+                                object-fit: cover;
+                            }
+            
+                            .user-info {
+                                @include user-info()
                             }
                         }
                     }

@@ -217,13 +217,25 @@ export const followAction = async (uidFrom, uidTo, isFollow) => {
   
   let fromUser = null
   let toUser = null
+  let fromAvt = null
+  let toAvt = null
+  let fromUserDN = null
+  let toUserDN = null
 
   await getDoc(userFromRef).then((snapshot) => {
     fromUser = snapshot.data().userName
+    fromUserDN = snapshot.data().displayName
+    if (snapshot.data().avatarURL) {
+      fromAvt = snapshot.data().avatarURL
+    }
   })
 
   await getDoc(userToRef).then((snapshot) => {
     toUser = snapshot.data().userName
+    toUserDN = snapshot.data().displayName
+    if (snapshot.data().avatarURL) {
+      toAvt = snapshot.data().avatarURL
+    }
   })
 
   try {
@@ -232,7 +244,7 @@ export const followAction = async (uidFrom, uidTo, isFollow) => {
         {
           socialStatus: {
             following: {
-              [uidTo]: [toUser, createdAt]
+              [uidTo]: [toUser, toUserDN, toAvt, createdAt]
             },
           }
         }, {merge: true})
@@ -241,7 +253,7 @@ export const followAction = async (uidFrom, uidTo, isFollow) => {
         {
           socialStatus: {
             follower: {
-              [uidFrom]: [fromUser, createdAt]
+              [uidFrom]: [fromUser, fromUserDN, fromAvt, createdAt]
             }
           }
         }, {merge: true})
