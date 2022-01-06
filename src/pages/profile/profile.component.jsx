@@ -102,10 +102,14 @@ const Profile = ({ isSignedIn }) => {
                     if (data.socialStatus) {
                         if (data.socialStatus.follower) {
                             setFollowerList(data.socialStatus.follower)
+                        } else {
+                            setFollowerList([])
                         }
 
                         if (data.socialStatus.following) {
                             setFollowingList(data.socialStatus.following)
+                        } else {
+                            setFollowingList([])
                         }
 
                         console.log('followerList =>', followerList)
